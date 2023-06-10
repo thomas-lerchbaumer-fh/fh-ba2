@@ -26,25 +26,46 @@ As there are various models available a literature review was conducted to figur
 Both models CNN and RNN/LSTM can be used for time series forecasting. To create accurate prediction models a basic knowledge about models functionality is required. Therefore this section explains the components of each NN as well as the approaches those models follow. 
 
 \subsection{LSTM}
-LSTM is an RNN and was invented by \cite{lstm_inventor} in 1997. Until today this NN is widley used for time series forecasting and provides reliable results for short as well as long term predictions \cite{rnn_moharm}. LSTM have so called memory cells which are responsible to store the state of data. Whenever information arrives at a memory cell its outcome is defined by refreshing the cell state with the newly arrived information. LSTM utilizes gates to control a cells state by either including or excluding information \cite{lstm_stock}. Those gates are called: 
+LSTM is an RNN and was invented by \cite{lstm_inventor} in 1997. Until today this NN is widley used for time series forecasting and provides reliable results for short as well as long term predictions \cite{rnn_moharm}. LSTM have so called memory cells which are responsible to store the state of data. Whenever information arrives at a memory cell its outcome is defined by refreshing the cell state with the newly arrived information. LSTM utilizes gates to control a cells state by either including or excluding information \cite{lstm_stock}. The gates are called: 
 \begin{itemize}
 \item input gate - data selection and storage for upcoming state
 \item forget gate - data selection and storage which will not be used for the upcoming state
 \item output gate - sets information within the state that is send to the output
 \end{itemize}
 Those gates are created by combining sigmoid functions. The results of this gates are values ranging from zero to one. A result of zero indicates the cell to not pass any infomration whereas values close to one indicates the cell to pass all information. 
-The LSTM Module or Repeating module consits of four NN layers which interact together as shown in Figure \ref{fig:lstm_rep_model}.
-
-
+The LSTM Module or Repeating module consists of four NN layers which interact together as shown in Figure \ref{fig:lstm_rep_model}:
 \begin{figure}[H]
 	\centering
 		\includegraphics[width=14cm]{images/lstm_module}
 	\caption{Repeating LSTM Module - [source:\cite{lstm_module}]}
 	\label{fig:lstm_rep_model}
 \end{figure}
+In total the repeating model has 3 gate activation functions which are named $\sigma_1$, $\sigma_2$,  $\sigma_3$ in figure \ref{fig:lstm_rep_model}. Furthermore $\sigma_1$ and $\sigma_2$ act as output activation functions too. The cell state is illustrated using a blue line which starts at St-1 which indicates the previous memory block to St representing the current memory block. The amount of information that is passed is regulated by layer  $\sigma_1$ using the following function:
+\begin{equation}
+cf_t = \sigma_1 (W_cf * [O_t-1, x_t] + b_cf)
+\cite{lstm_module}
+\label{eq:eq_1}
+\end{equation}
+Furthermore two network layers are used to store new information to the cell state. Therefore sigmoid layer $\sigma_2$ chooses the values which are updated by utilizing the following formula:
+\begin{equation}
+l_t = \sigma_2(W_1 *[O_t-1, x_t]+ b_l)
+\cite{lstm_module}
+\label{eq:eq_2}
+\end{equation}
+Layer $\phi_1$ or \verb|tanh| is created by using new candidate values. This layer outputs a  vector by utilzing the following formular: 
+\begin{equation}
+\widetilde{S}_t = tanh(W_s * [O_t-1, X_t] + b_s)
+\cite{lstm_module}
+\label{eq:eq_3}
+\end{equation}
+The last step includes combination of both states \ref{eq:eq_2} and \ref{eq:eq_3} which is added to the state. Also the state is reconditioned by applying: \cite{lstm_module}
+\begin{equation}
+S_t = cf_t * S_t1 + I_t * \widetilde{S}_t-1
+\cite{lstm_module}
+\label{eq:eq_4}
+\end{equation}
 
-
-
+The reason why a LSTM model is used for this purpose is that a standalone RNN is challenging to train due its characteristics. As Back propagation is used for RNN's problems like vanishing-gradient occur. The gradient in general can be understand as a computed value through all time setps which in the end used to update parameters of the RNN. The vanasihing-gratdient over time results in information decay. By implementing an LSTM module this problem can be solved. \cite{lstm_overcome_rnn_problem}
 
 \subsection{CNN}
 
