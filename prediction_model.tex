@@ -23,7 +23,20 @@ Both models are implemented using python and the following libraries.
 As there are various models available a literature review was conducted to figure out which models fit the purpose of time series forecasting. It turns out that the most promising NN that can be utilized for time series prediction are either Convolutional Neural Networks (CNN) or Recurrent Neural Networks (RNN) especially Long Short-Term Memory (LSTM)\cite{nn_1}\cite{nn_2}\cite{lstm_1}\cite{lstm_2}.
 
 \section{Backpropagation}
-As both of the models LSTM and CNN use back propagation (BP) for its training the basic concepts of the algorithm are explained in this section. One of the ingredients for BP is its activation function. Originally the sigmond function was used as activation function. As of today multiple other functions like softmax or(R)eLU emerged. \cite{bp_basic} The concept follows an iterative process. At the beginning there is the feed forward pass. During this phase the input data is passed through all layers and each hidden layer applies a linear function to create certain weights.  At the end the predicted outputs by the model are compared with the actual outputs of the training data. This comparison is evaluated through a loss function. At this step the actual learning process of the model starts by calculating the gradient of the loss function considering the output of the NN. After that the back pass is initiated. Along this phase the gradients of each previous layers are multiplied with a local gradient and the weights which results in a gradient with respect to the layer's inputs. After receiving all gradients  based on the network's input data all weights are updated and optimized to reduce the result of the loss function. The steps forward pass, loss calculation, back pass and weight updates are repeated to improve the network in an iterative way. Figure \ref{fig:bp} demonstrates the logic of the backpropagation algorithm. Whereas \verb|wu| represents the updated weights after each iteration. 
+
+As both of the models LSTM and CNN use back propagation (BP) for its training the basic concepts of the algorithm are explained in this section. To understand the logic of backpropagation a few terms need a detailed explanation: 
+
+\subsubsection{Gradient}
+
+\subsubsection{Bias}
+
+\subsubsection{Activation Function}
+
+\subsubsection{Weights}
+
+
+
+One of the ingredients for BP is its activation function. Originally the sigmond function was used as activation function. As of today multiple other functions like softmax or(R)eLU emerged. \cite{bp_basic} The concept follows an iterative process. At the beginning there is the feed forward pass. During this phase the input data is passed through all layers and each hidden layer applies a linear function to create certain weights.  At the end the predicted outputs by the model are compared with the actual outputs of the training data. This comparison is evaluated through a loss function. At this step the actual learning process of the model starts by calculating the gradient of the loss function considering the output of the NN. After that the back pass is initiated. Along this phase the gradients of each previous layers are multiplied with a local gradient and the weights which results in a gradient with respect to the layer's inputs. After receiving all gradients  based on the network's input data all weights are updated and optimized to reduce the result of the loss function. The steps forward pass, loss calculation, back pass and weight updates are repeated to improve the network in an iterative way. Figure \ref{fig:bp} demonstrates the logic of the backpropagation algorithm. Whereas \verb|wu| represents the updated weights after each iteration. 
 
 \begin{figure}[H]
 	\centering
