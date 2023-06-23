@@ -22,6 +22,15 @@ Both models are implemented using python and the following libraries.
 
 As there are various models available a literature review was conducted to figure out which models fit the purpose of time series forecasting. It turns out that the most promising NN that can be utilized for time series prediction are either Convolutional Neural Networks (CNN) or Recurrent Neural Networks (RNN) especially Long Short-Term Memory (LSTM)\cite{nn_1}\cite{nn_2}\cite{lstm_1}\cite{lstm_2}.
 
+\section{Backpropagation}
+As both of the models LSTM and CNN use back propagation (BP) for its training the basic concepts of the algorithm are explained in this section. One of the ingredients for BP is its activation function. Originally the sigmond function was used as activation function. As of today multiple other functions like softmax or(R)eLU emerged. \cite{bp_basic} The concept follows an iterative process. At the beginning there is the feed forward pass. During this phase the input data is passed through all layers and each hidden layer applies a linear function to create certain weights.  At the end the predicted outputs by the model are compared with the actual outputs of the training data. This comparison is evaluated through a loss function. At this step the actual learning process of the model starts by calculating the gradient of the loss function considering the output of the NN. After that the back pass is initiated. Along this phase the gradients of each previous layers are multiplied with a local gradient and the weights which results in a gradient with respect to the layer's inputs. After receiving all gradients  based on the network's input data all weights are updated and optimized to reduce the result of the loss function. The steps forward pass, loss calculation, back pass and weight updates are repeated to improve the network in an iterative way. Figure \ref{fig:bp} demonstrates the logic of the backpropagation algorithm. Whereas \verb|wu| represents the updated weights after each iteration. 
+
+\begin{figure}[H]
+	\centering
+		\includegraphics[width=14cm]{images/bp}
+	\caption{Simplified logic of the backpropagation algorithmus - [source:\cite{bp_basic}]}
+	\label{fig:bp}
+\end{figure}
 \section{The Models}
 Both models CNN and RNN/LSTM can be used for time series forecasting. To create accurate prediction models a basic knowledge about models functionality is required. Therefore this section explains the components of each NN as well as the approaches those models follow. 
 
@@ -40,7 +49,7 @@ The LSTM Module or Repeating module consists of four NN layers which interact to
 	\caption{Repeating LSTM Module - [source:\cite{lstm_module}]}
 	\label{fig:lstm_rep_model}
 \end{figure}
-In total the repeating model has 3 gate activation functions which are named $\sigma_1$, $\sigma_2$,  $\sigma_3$ in figure \ref{fig:lstm_rep_model}. Furthermore $\sigma_1$ and $\sigma_2$ act as output activation functions too. The cell state is illustrated using a blue line which starts at St-1 which indicates the previous memory block to St representing the current memory block. The amount of information that is passed is regulated by layer  $\sigma_1$ using the following function:
+In total the repeating model has 3 gate activation functions which are named $\sigma_1$, $\sigma_2$,  $\sigma_3$ and shown in figure \ref{fig:lstm_rep_model}. Furthermore $\sigma_1$ and $\sigma_2$ act as output activation functions too. The cell state is illustrated using a blue line which starts at St-1 which indicates the previous memory block to St representing the current memory block. The amount of information that is passed is regulated by layer  $\sigma_1$ using the following function:
 \begin{equation}
 cf_t = \sigma_1 (W_cf * [O_t-1, x_t] + b_cf)
 \cite{lstm_module}
@@ -68,6 +77,39 @@ S_t = cf_t * S_t1 + I_t * \widetilde{S}_t-1
 The reason why a LSTM model is used for this purpose is that a standalone RNN is challenging to train due its characteristics. As Back propagation is used for RNN's problems like vanishing-gradient occur. The gradient in general can be understand as a computed value through all time setps which in the end used to update parameters of the RNN. The vanasihing-gratdient over time results in information decay. By implementing an LSTM module this problem can be solved. \cite{lstm_overcome_rnn_problem}
 
 \subsection{CNN}
+CNN's follow the concept of NN consisting of multiple layers. The scope of application for this kind of network reaches from computer vision problems to time-series forecast modelling. Whereas data provided for image classification is structured in multi dimensional arrays (matrices), data used for time-series forecasting is provided via one dimensional arrays.\cite{cnn_intro} A CNN provides different types of layers . Those layer types are called pooling layer (PL), fully connected (FC), Convolution layer (CL) and flatten layer (FL). The connection of those layers are demonstrated in figure \ref{fig:cnn_struct}.
+\begin{figure}[H]
+	\centering
+		\includegraphics[width=10cm]{images/1d_cnn_model}
+	\caption{One Dimensional CNN Structure - [source:\cite{cnn_vechicle}]}
+	\label{fig:cnn_struct}
+\end{figure}
+
+CNN is based on convolution which is a linear operation that multiplies input data with convolution filters. Those filters which are also called kernels correlate to a set of weights \cite{cnn_vechicle}. The kernel values are created during the learning process and are optimized from the NN utilizing back propagation. Furthermore this layer is utilized to detect features within the given one dimensional array. Those features are stored within a feature map and are calculated by applying convolutions on the input data. One crucial parameter to detect proper features is the size of the kernel. The kernel size can be understand as a number of weights that are multiplied with the input data. After each multiplication the sequence is shifted along the input data. Each shift during this process produces one output which is stored in the feature map. The following example demonstrates how this process is done.\cite{1d_cnn}
+\begin{lstlisting}
+Input Data: [4,7,10,43,20,10] e.g. number of bookings per day. 
+Kernel: [0.5,0.25,0.2] Kernel size = 3
+1st Multiplication: 4*0.5 + 7*0.25 + 10*0.2 = 5.75
+2nd Multiplication: 7*0.5 + 10*0.25 + 43*0.2 = 14.6
+...
+Output sequence [5.75, 14.6, ...]
+\end{lstlisting}
+The second operation that is used within the CNN is called activation function. This non-linear function is utilized to detect complex relationships between variables and are applied onto the feature map. As of today multiple functions like ReLU, Sigmoid and softmax can be used as activation functions \cite{cnn_basic3}.
+
+The pooling layer as shown in figure \ref{fig:cnn_struct} is deployed within a NN to diminish the size of feature maps. To reduce the size pooling operations like average pooling, max pooling or sum pooling can be applied. Applying one of those operations results in less computational efford.\cite{cnn_basic}
+
+The activation function is used within the fully connected layer. This layer applies the activation function onto the feature map and enables the model in combination with backpropagation to learn complex connections between features.\cite{1d_cnn}
+
+The flatten layer transforms two dimensional input data into one dimensional input vectors. It's output is used to provide outputs to the fully connected layer. Over-fitting can be caused whenever all features are used in the flatten layer therefore a dropout layer can be set in place. This layer cancels out neurons during the training process of a NN which reduces the model's size. 
+
+\section{Overfitting and Underfitting}
+One problem that can occur when utilizing NN for predictions is over-fitting or under-fitting of the training data. Both scenarios result in a poor performance of the trained model.
+\subsection{Overfitting}
+
+Overfitting describes the phenomenon that the model is not able to improve its problem solving capabilities after a certain period of training. There are multiple reasons for the occurrence of overfitting. One reason for example is a inaccurate or unbalanced training set. This leads to the fact that the NN produces wrong connections during its training.  Whereas the results for the training set are accurate the problems  occur during the validation phase because the model learned wrong characteristics. \cite{fitting} 
+\subsection{Underfitting}
+On the other hand underfitting arises when the model is not capable of identifying the traits of the training set and therefore struggles to achieve matching its target values. This results in a high loss values. Reasons for underfitting are caused by a lack of trainable parameters as well as a NN model with a simple architecture in terms of hidden layers.
+\\\newline In section \ref{sec:data_cleansing} and \ref{sec:data_aug} actions were taken to avoid both overfitting and underfitting. 
 
 
 \section{Implementation}

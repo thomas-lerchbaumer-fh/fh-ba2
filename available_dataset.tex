@@ -11,7 +11,7 @@
 %----------------------------------------------------------------
 
 \chapter{Available Dataset}
-\label{chap:introduction}
+\label{chap:available_dataset}
 This chapter focuses on explaining and analysing the available data. The data is analyzed for Business Intelligence (BI) purposes as well as on metrics that can be used to create predictions. Whereas BI \cite{9325610} focuses on historical data and aims to support managers to make decisions traditional methods like predictive analytic asses potential future scenarios using advanced statistical methods \cite{9671997}.
 
 \section{Data Origin}
@@ -88,7 +88,7 @@ Starting from March 2020 countries like Austria, Germany, Switzerland and Lichte
 \begin{figure}[H]
 	\centering
 		\includegraphics[width=14cm]{images/no_augmentation}
-	\caption{Drop in bookings - [source:author]}
+	\caption{Bookings over time - [source:author]}
 	\label{fig:noAug}
 \end{figure}
 Figure \ref{fig:noAug} highlights the drop of bookings starting from March 2020 until June 2022. To achieve reliable results when utilizing this data for a time series forecasting ML model this time period needs augmentation. When analysing the chart \ref{fig:noAug} an continuous growth of bookings is visible until 2021. One way to augment the data \\citehere is calculate the average growth during this time span. To substitute the distorted data the current data is replaced by the value of the previous year. This value is then multiplied by the average growth. Furthermore missing timestamps throughout the whole time series are added with a value of zero. The following logic is applied to the data frame: 
