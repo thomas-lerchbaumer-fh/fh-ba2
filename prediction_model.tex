@@ -25,18 +25,39 @@ As there are various models available a literature review was conducted to figur
 \section{Backpropagation}
 
 As both of the models LSTM and CNN use back propagation (BP) for its training the basic concepts of the algorithm are explained in this section. To understand the logic of backpropagation a few terms need a detailed explanation: 
-
 \subsubsection{Gradient}
-
+The gardient also called gradient descent is an algorithm that is used to optimize the loss function within backpropagation. That means that the gradient descent indicates by how much the weights and biases need to be adjusted in order to reduce the actual error value which is the result of the applied loss function. \cite{bp_basic}
 \subsubsection{Bias}
-
+The bias is an additional parameter used in each neuron of a NN. It is used to directly influence the activation function to offset the results either to the negative or positive direction. When looking at the sigmoid function without any bias in place where \verb|x| correlates to the input value and \verb|w| indicates the used weight: 
+\begin{equation}
+ \sigma(x) = \frac{1} {1 + e^{-{(w*x)}}}
+\label{eq:eq_4}
+\end{equation}
+When looking at figure \ref{fig:sig_wo_bias} the weights only influence the steepness of the function but won't shift it along the x axes.
+\begin{figure}[H]
+	\centering
+		\includegraphics[width=8cm]{images/sigmoid_w_weights}
+	\caption{Sigmoid function with different weights and no bias - [source:\cite{lstm_module}]}
+	\label{fig:sig_wo_bias}
+\end{figure}
+ To shift the function along the x axes the sigmoid function is adapted with the bias \verb|b| value: 
+\begin{equation}
+ \sigma(x) = \frac{1} {1 + e^{-{(w*x+b)}}}
+\label{eq:eq_4}
+\end{equation}
+By adding the bias value as constant to the sigmoid function can be shifted along the x axes as shown in \ref{fig:sig_w_bias}.
+\begin{figure}[H]
+	\centering
+		\includegraphics[width=8cm]{images/bias}
+	\caption{Sigmoid function with same weights but different bias - [source:author]}
+	\label{fig:sig_w_bias}
+\end{figure}
+The bias therefore is utilized to directly influence the result of the activation function and whether or not a certain neuron is activated or not. 
 \subsubsection{Activation Function}
+Activation functions introduce non-linearity characteristics to NN. This function is applied to the output of a neuron and decides weather or not a neuron is activated or not.\cite{activation}. In combination with the descent gradient this function enables the NN to learn complex patterns within a training set. Orignially the sigmoid function \cite{bp_basic} was used as activation function for NN but as of today multiple other functions like softmax, Tanh, ReLu emerged \cite{activation}.
 
-\subsubsection{Weights}
-
-
-
-One of the ingredients for BP is its activation function. Originally the sigmond function was used as activation function. As of today multiple other functions like softmax or(R)eLU emerged. \cite{bp_basic} The concept follows an iterative process. At the beginning there is the feed forward pass. During this phase the input data is passed through all layers and each hidden layer applies a linear function to create certain weights.  At the end the predicted outputs by the model are compared with the actual outputs of the training data. This comparison is evaluated through a loss function. At this step the actual learning process of the model starts by calculating the gradient of the loss function considering the output of the NN. After that the back pass is initiated. Along this phase the gradients of each previous layers are multiplied with a local gradient and the weights which results in a gradient with respect to the layer's inputs. After receiving all gradients  based on the network's input data all weights are updated and optimized to reduce the result of the loss function. The steps forward pass, loss calculation, back pass and weight updates are repeated to improve the network in an iterative way. Figure \ref{fig:bp} demonstrates the logic of the backpropagation algorithm. Whereas \verb|wu| represents the updated weights after each iteration. 
+\subsubsection{Phases} 
+ Backpropagation follows an iterative process. At the beginning there is the feed forward pass. During this phase the input data is passed through all layers. Each hidden layer applies a linear function to create certain weights those outputs then are fed to the activation function. Depending on how many hidden layers are used within the NN the output of the activation function is used as input for the next neuron. At the end the predicted outputs by the model are compared with the actual outputs of the training data. This comparison is evaluated through a loss function. At this step the actual learning process of the model starts by calculating the gradient of the loss function considering the output of the NN. After that the back pass is initiated. Along this phase the gradients of each previous layers are multiplied with a local gradient it's weights which results in a gradient in respect to the layer's inputs. After receiving all gradients  based on the network's input data, all weights and biases are updated and optimized to reduce the result of the loss function. The steps forward pass, loss calculation, back pass, and the updates of weight and biases are repeated to improve the network in an iterative way. \cite{bp_basic} Figure \ref{fig:bp} demonstrates the logic of the backpropagation algorithm. Whereas \verb|wu| represents the updated weights after each iteration.  
 
 \begin{figure}[H]
 	\centering
@@ -124,9 +145,7 @@ Overfitting describes the phenomenon that the model is not able to improve its p
 On the other hand underfitting arises when the model is not capable of identifying the traits of the training set and therefore struggles to achieve matching its target values. This results in a high loss values. Reasons for underfitting are caused by a lack of trainable parameters as well as a NN model with a simple architecture in terms of hidden layers.
 \\\newline In section \ref{sec:data_cleansing} and \ref{sec:data_aug} actions were taken to avoid both overfitting and underfitting. 
 
-
 \section{Implementation}
-
 
 \section{Reliability Comparison - LSTM, CNN}
 
