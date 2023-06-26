@@ -126,8 +126,16 @@ This section focuses on which potential information from the available dataset c
 
 
 \subsection{Improving the Yield Management}
+In general Yield Management (YM) describes the way how limited resources like hotel rooms, seats within an air plane or available buses are assigned to customers by levearging the highest possible revenue. American Airlines claims that by utilizing YM they are able to increase their revenue by 500 million dollars per year \cite{ym_practice}. Before integrating YM a few considerations about the characteristics of teh provided service need to be made otherwise YM might actually cause a decrease in revenue. The following characteristics are suitable for the utilization of YM:\cite{ym_practice}
+\begin{itemize}
+  \item Storing surplus resources can either be costly or unattainable. 
+  \item Whenever future demand is uncertain commitments need to be done.
+  \item It is possible to differentiate between customer segments
+  \item A single unit can be used to provide different services 
+  \item The company is not legally limited in their actions of selling a certain service or not.
+\end{itemize}
+As YM is already in place at busfinder one of the characteristics mentioned above comes along with a high uncertainty. Although commitments for uncertain future demand are made the ability to predict future bookings would further improve the YM. Being able to predict future bookings during ordinary market conditions (e.g. no travel restrictions in place) those estimates directly can be used to influence factor of capacity management - How many buses are available? This directly influences the pricing strategy because a higher demand results in a higher price.
 
-Explain what can be applied to the dataset, what processes could be improved by analysing the data. 
+Both Artificial Neural Networks (ANNs) and their usage for time series forecasting further evolved over the past years. Additionally libraries like tensorflow  reduce the complexity of developing ANNs. Hence this method is a suitable solution to predict future bookings. Therefore the basics of ANN and the development of two different models are explained in chapter \ref{chap:predict}.
 
-Improve Yield Managment  (Prediction Model, ML) 
 
