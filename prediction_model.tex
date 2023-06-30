@@ -70,6 +70,7 @@ Activation functions introduce non-linearity characteristics to NN. This functio
 Both models CNN and RNN/LSTM can be used for time series forecasting. To create accurate prediction models a basic knowledge about models functionality is required. Therefore this section explains the components of each NN as well as the approaches those models follow. 
 
 \subsection{LSTM}
+\label{sec:lstm}
 LSTM is an RNN and was invented by \cite{lstm_inventor} in 1997. Until today this NN is widley used for time series forecasting and provides reliable results for short as well as long term predictions \cite{rnn_moharm}. LSTM have so called memory cells which are responsible to store the state of data. Whenever information arrives at a memory cell its outcome is defined by refreshing the cell state with the newly arrived information. LSTM utilizes gates to control a cells state by either including or excluding information \cite{lstm_stock}. The gates are called: 
 \begin{itemize}
 \item input gate - data selection and storage for upcoming state
@@ -111,6 +112,9 @@ S_t = cf_t * S_t1 + I_t * \widetilde{S}_t-1
 
 The reason why a LSTM model is used for this purpose is that a standalone RNN is challenging to train due its characteristics. As Back propagation is used for RNN's problems like vanishing-gradient occur. The gradient in general can be understand as a computed value through all time setps which in the end used to update parameters of the RNN. The vanasihing-gratdient over time results in information decay. By implementing an LSTM module this problem can be solved. \cite{lstm_overcome_rnn_problem}
 
+\subsubsection{Bidirectional LSTM}
+Bidirectional LSTMs are able to look in both directions past and future. This is achieved by processing the available data into both directions. Therefore those models make use of bidirectional layers. Those layers split up the used neurons into two directions. \cite{bi_di_1} This provides more information to the network as the model is now capable if storing the forward state as well as the backward state. Resulting in potentially more accurate results \cite{bi_di_2}. 
+
 \subsection{CNN}
 CNN's follow the concept of NN consisting of multiple layers. The scope of application for this kind of network reaches from computer vision problems to time-series forecast modelling. Whereas data provided for image classification is structured in multi dimensional arrays (matrices), data used for time-series forecasting is provided via one dimensional arrays.\cite{cnn_intro} A CNN provides different types of layers . Those layer types are called pooling layer (PL), fully connected (FC), Convolution layer (CL) and flatten layer (FL). The connection of those layers are demonstrated in figure \ref{fig:cnn_struct}.
 \begin{figure}[H]
@@ -147,6 +151,96 @@ On the other hand underfitting arises when the model is not capable of identifyi
 \\\newline In section \ref{sec:data_cleansing} and \ref{sec:data_aug} actions were taken to avoid both overfitting and underfitting. 
 
 \section{Implementation}
+Both models follow the same workflow when it comes to their implementation. The workflow is highlighted in figure \ref{fig:workflow}:
+
+\begin{figure}[H]
+	\centering
+		\includegraphics[width=8cm]{images/workflow_imp}
+	\caption{Workflow of the implementation - [source:[author]]}
+	\label{fig:workflow}
+\end{figure}
+
+As each booking correlates to one entry within the database table the data those entries need to be grouped on a daily basis. Therefore the following sql query is executed: 
+\begin{lstlisting}
+import mysql.connector
+import logging
+import pandas as pd
+
+def get_booking_data():
+
+    sql = ("SELECT count(createdAt) as bookings, date(createdAt) from bookings"
+           "WHERE date(createdAt) <= DATE('2023-05-01') 
+           "and date(createdAt) >= DATE('2017-01-01')"
+           "Group By date(createdAt) order by date(createdAt) asc")
+
+    res = pd.read_sql(sql, connection)
+    return res
+\end{lstlisting}
+
+Once the data is retrieved from the database it is directly converted to a \verb|pandas dataframe|. As mentioned in chapter \ref{sec:data_aug} data augmentation is necessary to compensate the lack of data during COVID19 \ref{sec:data_aug}. Corresponding to the workflow described in figure \ref{fig:workflow} the data now needs to be separated into a training and test set. The training set is used to train the model whereas the test set is used to display how the trained model performs. Therefore the trained model is used to predict the values for timestamps used in the test set. By reviewing other scientific works that deal with time series forecasting \cite{1d_cnn},\cite{cnn_vechicle},\cite{cnn_intro},\cite{lstm_overcome_rnn_problem},\cite{lstm_module},\cite{lstm_stock} the most accurate results are achieved by using ranges from 80\% to 90\% for training and depending on the range for training data a range of 20\% to 10\% for test data are recommended. The initial split used for both models correlates to 90\% training data to 10\% test data as visualized in \ref{fig:training_test} . Therefore the following code is applied to split the data:
+\begin{lstlisting}
+training_end = pd.to_datetime('2022-10-31')
+#total range 2017-01-01 - 2023-05-31 = 2342 days
+train = df[:training_end]
+# 2017-01-01 - 2022-10-31 = 2129 days ~ 90%
+test = df[training_end:]
+# 2022-10-31 - 2023-05-01 = 213 days ~ 10%
+\end{lstlisting}
+\begin{figure}[H]
+	\centering
+		\includegraphics[width=14cm]{images/training_test}
+	\caption{Visualized Training-Test split (90\%-10\%) - [source:[author]]}
+	\label{fig:training_test}
+\end{figure}
+With the training and test data in place the next step is to implement both models (LSTM, CNN) by utilizing the \verb|tensorflow| library. To reduce computation costs and to increase training efficiency the training data is further processed.
+\begin{lstlisting}
+WINDOW = 20  # data window of 20 days
+bookings_training_90 = tf.data.Dataset.from_tensor_slices(train.values)
+bookings_training_90 = bookings_training_90.window(WINDOW + 1, shift=1, drop_remainder=True)
+bookings_training_90 = bookings_training_90.flat_map(lambda x: x.batch(WINDOW + 1))
+bookings_training_90 = bookings_training_90.map(lambda x: (x[:-1], x[-1]))
+\end{lstlisting}
+On line 2 the code above transforms the training data into a \verb|TensorSliceDataset|. This data format grants access to tensorflows data API which supports the user to manipulate the data further. As this is time serires data the model itself is fed with data limited to certain ranges. The constant \verb|WINDOW| indicates a range of 20 days which is used for training. The function \verb|flat.map()| is now used to flatten the dataset. As \verb|from_tensor_slices()| creates a single tensor for each entry in a window \verb|flat.map()| combines those windows to a single tensor holding the windowed data. Line 5 prepares the data and splits each window into features and target values. As the learning process described in section \ref{chap:Backpropagation} involves multiple inputs that are used to predict one output the \verb|.map()| function prepares each windowed tensor by using the interval from \verb|x to x-1| to predict \verb|x-1|.
+Both models LSTM and CNN are trained with the prepared data explained in during this section. 
+
+\subsection{Implementation of LSTM}
+The code itself required to setup a LSTM model only requires a few input parameters. Therefore it is crucial to understand the meaning behind the input parameters as well as how they can influence the training results of the model itself. The following code is used to initialize the model:   
+\begin{lstlisting}
+#define the model
+lstm_booking_prediction_model = Sequential([
+    Lambda(lambda x: tf.expand_dims(x, axis=-1), input_shape=[WINDOW]),
+    Bidirectional(LSTM(128, return_sequences=True)),
+    Bidirectional(LSTM(64)),
+    Dense(512, activation='relu'),
+    Dropout(0.4),
+    Dense(128)
+	])
+\end{lstlisting}
+When utilizing LSTM for time series predictions a certain input format for data is needed. Therefore the Lambda function on line 3 is required to reshape the dimension of the used input data. 
+\verb|Bidirectional()|\footnote{\label{tf_fn}\url{https://www.tensorflow.org/api_docs/python/tf/keras/}} actually represents a wrapper for the actual layer used for this model. In this case its holding additional states and is used to created a Bi-LSTM model as described in \ref{sec:lstm}. \newline
+\verb|LSTM()|\textsuperscript{\ref{tf_fn}} contains the logic actual logic as described in \ref{sec:lstm}. Furthermore the parameter \verb|unit=128|\textsuperscript{\ref{tf_fn}} can be understand as the number of neurons used within this layer. 
+\begin{lstlisting}
+#compile the model 
+lstm_booking_prediction_model.compile(
+    loss=Huber(),
+    optimizer=Adam(),
+    metrics=['mae']
+	)
+\end{lstlisting}
+
+\begin{lstlisting}
+#start to train the model
+lstm_history = lstm_booking_prediction_model.fit(
+    bookings_training_90,
+    epochs=100,
+    verbose=1,
+    use_multiprocessing=True
+	)
+\end{lstlisting}
+
+
+
+
 
 \section{Reliability Comparison - LSTM, CNN}
 
