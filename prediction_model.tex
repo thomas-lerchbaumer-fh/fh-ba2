@@ -180,32 +180,9 @@ The loss function is one crucial element as they evaluate the accuracy of the pr
 
 By looking at the characteristics of the augmented data set shown in figure \ref{fig:augmented_data} it is clear to see that the dataset itself has got outliers repeating themselves every year. To avoid a strong focus on those peaks both models are initial trained utilizing the Adam loss function.
 
-\section{Optimize Functions}
+\section{Optimize Function}
 \label{sec:optimize_func}
-To optimize a NN's parameters an optimizer function is required. This function updates parameters like weights based on the results provided by the loss function \cite{optimizer}. Since both NN's described in this section make use of backpropagation for their training a short overview about available optimizers and characteristics are given below. 
-
-\begin{table*}[htbp]
-	\centering
-		\begin{tabularx}{\textwidth}{|l|X|}
-		\hline
-		\rowcolor[gray]{0.9}
-		Function & Characteristics \\
-		\hline
-		Square loss &Sensitive to outliers (Model tends to focus on those outliers whereas accuracy for normal values decline)\\
-		 \hline
-		Absolute loss & Outliers do not influence the model as severe as compared to square loss  \\
-		Huber & Combination of square loss and absolute loss - Outliers do not influence the accuracy of results and learning from smaller errors can still be done in a efficient way  \\
-		\hline
-		Log-cosh & Similar to Huber when it comes to its characteristics. Does not handle large errors well because the gradient tends to stay constant. \\
-		\hline
-		Quantile loss & Extends absolute loss and provides prediction intervals. Utilizing a punishment system for overestimated and underestimated samples. \\
-		\hline
-		$\epsilon$-insensitive & Focuses on samples with large prediction errors \\
-		\hline	
-		\end{tabularx}
-	\caption{Loss functions and their characteristics - [source:\cite{loss_func}]}
-	\label{tab:loss_function}
-\end{table*}
+To optimize a NN's parameters an optimizer function is required. This function updates parameters like weights based on the results provided by the loss function \cite{optimizer}. Since both NN's described in this section make use of backpropagation for their training a literature review was conducted to figure out which optimizer is keen to deliver the most accurate results. By inspecting the advantages and disadvantages proposed by these works \cite{optimizer}\cite{optimizer_1}\cite{optimizer_2} it turns out that the algorithm ADAM is a valid choice. This algorithm is characterized by achieving faster convergence compared to other algorithms. Furthermore Adam provides a decent performance for datasets with meager features.
 
 \section{Implementation}
 Both models follow the same workflow when it comes to their implementation. The workflow is highlighted in figure \ref{fig:workflow}:
@@ -267,7 +244,7 @@ The code itself required to setup a LSTM model only requires a few input paramet
 lstm_booking_prediction_model = Sequential([
     Lambda(lambda x: tf.expand_dims(x, axis=-1), input_shape=[WINDOW]),
     Bidirectional(LSTM(128, return_sequences=True, activation='tanh',recurrent_activation='sigmoid' )),
-    Bidirectional(LSTM(64)),
+    Bidirectional(LSTM(128)),
     Dense(units=512, activation='relu'),
     Dropout(0.4),
 	])
@@ -284,9 +261,9 @@ lstm_booking_prediction_model.compile(
     metrics=['mae']
 	)
 \end{lstlisting}
+The Parameter \verb|loss| sets the loss function which is utilized to evaluate the models performance. The reason why \verb|Huber| is used is explained in section \ref{sec:loss_func}. Futhermore the model also requires an optimizing algorithm. This algorithm is assigned by using the \verb|optimizer| parameter. Due to the results of a literature review explained in section \ref{sec:optimize_func} Adam turned out to be the most promising candidate for this purpose. To observe the capability of learning of a given model the metric mean absolute error(mea) can be used. 
 
-
-
+The next step is to start the training of the model as demonstrated below:
 \begin{lstlisting}
 #start to train the model
 lstm_history = lstm_booking_prediction_model.fit(
@@ -296,7 +273,7 @@ lstm_history = lstm_booking_prediction_model.fit(
     use_multiprocessing=True
 	)
 \end{lstlisting}
-
+The function \verb|fit()| requires parameters like the data used for training (\verb|bookings_training_90|) as well as how many epochs are processed. One \verb|epoch| covers the process of iterating through the entire training dataset and performing forward and backward propagation as well as updating the model's parameters based on the chosen optimization algorithm.
 
 
 
