@@ -116,6 +116,7 @@ The reason why a LSTM model is used for this purpose is that a standalone RNN is
 Bidirectional LSTMs are able to look in both directions past and future. This is achieved by processing the available data into both directions. Therefore those models make use of bidirectional layers. Those layers split up the used neurons into two directions. \cite{bi_di_1} This provides more information to the network as the model is now capable if storing the forward state as well as the backward state. Resulting in potentially more accurate results \cite{bi_di_2}. 
 
 \subsection{CNN}
+\label{sec:cnn}
 CNN's follow the concept of NN consisting of multiple layers. The scope of application for this kind of network reaches from computer vision problems to time-series forecast modelling. Whereas data provided for image classification is structured in multi dimensional arrays (matrices), data used for time-series forecasting is provided via one dimensional arrays.\cite{cnn_intro} A CNN provides different types of layers . Those layer types are called pooling layer (PL), fully connected (FC), Convolution layer (CL) and flatten layer (FL). The connection of those layers are demonstrated in figure \ref{fig:cnn_struct}.
 \begin{figure}[H]
 	\centering
@@ -137,7 +138,7 @@ The second operation that is used within the CNN is called activation function. 
 
 The pooling layer as shown in figure \ref{fig:cnn_struct} is deployed within a NN to diminish the size of feature maps. To reduce the size pooling operations like average pooling, max pooling or sum pooling can be applied. Applying one of those operations results in less computational efford.\cite{cnn_basic}
 
-The activation function is used within the fully connected layer. This layer applies the activation function onto the feature map and enables the model in combination with backpropagation to learn complex connections between features.\cite{1d_cnn}
+The activation function is also part of the fully connected layer. This layer applies the activation function onto the feature map and enables the model in combination with backpropagation to learn complex connections between features. Furthermore this layer operates on the already flatten feature map and outputs a 2d vector.\cite{1d_cnn}
 
 The flatten layer transforms two dimensional input data into one dimensional input vectors. It's output is used to provide outputs to the fully connected layer. Over-fitting can be caused whenever all features are used in the flatten layer therefore a dropout layer can be set in place. This layer cancels out neurons during the training process of a NN which reduces the model's size. 
 
@@ -149,6 +150,62 @@ Overfitting describes the phenomenon that the model is not able to improve its p
 \subsection{Underfitting}
 On the other hand underfitting arises when the model is not capable of identifying the traits of the training set and therefore struggles to achieve matching its target values. This results in a high loss values. Reasons for underfitting are caused by a lack of trainable parameters as well as a NN model with a simple architecture in terms of hidden layers.
 \\\newline In section \ref{sec:data_cleansing} and \ref{sec:data_aug} actions were taken to avoid both overfitting and underfitting. 
+
+\section{Loss Function}
+\label{sec:loss_func}
+The loss function is one crucial element as they evaluate the accuracy of the produced outputs from a NN. This is achieved by calculating the difference between the predicted value and the actual value provided by the test dataset. Supervised learning deals with two different problems which is either a classification problem i.e. is the animal on the picture a cat or with regression problems which deal with i.e. predicting future bookings. Both of those problems use different loss function.\cite{loss_func} As this section focuses on solving a regression problem a brief overview about available loss functions and their characteristics are given. 
+
+\begin{table*}[htbp]
+	\centering
+		\begin{tabularx}{\textwidth}{|l|X|}
+		\hline
+		\rowcolor[gray]{0.9}
+		Function & Characteristics \\
+		\hline
+		Square loss &Sensitive to outliers (Model tends to focus on those outliers whereas accuracy for normal values decline)\\
+		 \hline
+		Absolute loss & Outliers do not influence the model as severe as compared to square loss  \\
+		Huber & Combination of square loss and absolute loss - Outliers do not influence the accuracy of results and learning from smaller errors can still be done in a efficient way  \\
+		\hline
+		Log-cosh & Similar to Huber when it comes to its characteristics. Does not handle large errors well because the gradient tends to stay constant. \\
+		\hline
+		Quantile loss & Extends absolute loss and provides prediction intervals. Utilizing a punishment system for overestimated and underestimated samples. \\
+		\hline
+		$\epsilon$-insensitive & Focuses on samples with large prediction errors \\
+		\hline	
+		\end{tabularx}
+	\caption{Loss functions and their characteristics - [source:\cite{loss_func}]}
+	\label{tab:loss_function}
+\end{table*}
+
+By looking at the characteristics of the augmented data set shown in figure \ref{fig:augmented_data} it is clear to see that the dataset itself has got outliers repeating themselves every year. To avoid a strong focus on those peaks both models are initial trained utilizing the Adam loss function.
+
+\section{Optimize Functions}
+\label{sec:optimize_func}
+To optimize a NN's parameters an optimizer function is required. This function updates parameters like weights based on the results provided by the loss function \cite{optimizer}. Since both NN's described in this section make use of backpropagation for their training a short overview about available optimizers and characteristics are given below. 
+
+\begin{table*}[htbp]
+	\centering
+		\begin{tabularx}{\textwidth}{|l|X|}
+		\hline
+		\rowcolor[gray]{0.9}
+		Function & Characteristics \\
+		\hline
+		Square loss &Sensitive to outliers (Model tends to focus on those outliers whereas accuracy for normal values decline)\\
+		 \hline
+		Absolute loss & Outliers do not influence the model as severe as compared to square loss  \\
+		Huber & Combination of square loss and absolute loss - Outliers do not influence the accuracy of results and learning from smaller errors can still be done in a efficient way  \\
+		\hline
+		Log-cosh & Similar to Huber when it comes to its characteristics. Does not handle large errors well because the gradient tends to stay constant. \\
+		\hline
+		Quantile loss & Extends absolute loss and provides prediction intervals. Utilizing a punishment system for overestimated and underestimated samples. \\
+		\hline
+		$\epsilon$-insensitive & Focuses on samples with large prediction errors \\
+		\hline	
+		\end{tabularx}
+	\caption{Loss functions and their characteristics - [source:\cite{loss_func}]}
+	\label{tab:loss_function}
+\end{table*}
 
 \section{Implementation}
 Both models follow the same workflow when it comes to their implementation. The workflow is highlighted in figure \ref{fig:workflow}:
@@ -209,16 +266,16 @@ The code itself required to setup a LSTM model only requires a few input paramet
 #define the model
 lstm_booking_prediction_model = Sequential([
     Lambda(lambda x: tf.expand_dims(x, axis=-1), input_shape=[WINDOW]),
-    Bidirectional(LSTM(128, return_sequences=True)),
+    Bidirectional(LSTM(128, return_sequences=True, activation='tanh',recurrent_activation='sigmoid' )),
     Bidirectional(LSTM(64)),
-    Dense(512, activation='relu'),
+    Dense(units=512, activation='relu'),
     Dropout(0.4),
-    Dense(128)
 	])
 \end{lstlisting}
 When utilizing LSTM for time series predictions a certain input format for data is needed. Therefore the Lambda function on line 3 is required to reshape the dimension of the used input data. 
 \verb|Bidirectional()|\footnote{\label{tf_fn}\url{https://www.tensorflow.org/api_docs/python/tf/keras/}} actually represents a wrapper for the actual layer used for this model. In this case its holding additional states and is used to created a Bi-LSTM model as described in \ref{sec:lstm}. \newline
-\verb|LSTM()|\textsuperscript{\ref{tf_fn}} contains the logic actual logic as described in \ref{sec:lstm}. Furthermore the parameter \verb|unit=128|\textsuperscript{\ref{tf_fn}} can be understand as the number of neurons used within this layer. 
+\verb|LSTM()|\textsuperscript{\ref{tf_fn}} contains the logic actual logic as described in \ref{sec:lstm}. Furthermore the parameter \verb|unit=128|\textsuperscript{\ref{tf_fn}} can be understand as the number of neurons used within this layer. Furthermore this model offers different kind of activation functions. By default the hyperbolic tangent (tanh)\cite{tanh} is used. Whereas the \verb|recurrent_activation| defines which functions are used for the actual gates within the module as described in \ref{sec:lstm}. Whenever creating a stacked LSTM model, which means it makes use of at least two LSTM layers the paramater \verb|return_sequences| must be set to true. Otherwise the layer's output results in a 2D tensor output which only provides information about the last timestep. This format cannot be passed on to the next LSTM layer. \newline
+\verb|Dense()| is used to implement fully connected layers whereas \verb|units| correlate to the amount of neurons used for this layer. The way this layer works is explained in section \ref{sec:cnn}. Additional the model needs to be compiled. Therefore the following code is required: 
 \begin{lstlisting}
 #compile the model 
 lstm_booking_prediction_model.compile(
@@ -227,6 +284,8 @@ lstm_booking_prediction_model.compile(
     metrics=['mae']
 	)
 \end{lstlisting}
+
+
 
 \begin{lstlisting}
 #start to train the model
