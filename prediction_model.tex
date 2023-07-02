@@ -245,8 +245,9 @@ lstm_booking_prediction_model = Sequential([
     Lambda(lambda x: tf.expand_dims(x, axis=-1), input_shape=[WINDOW]),
     Bidirectional(LSTM(128, return_sequences=True, activation='tanh',recurrent_activation='sigmoid' )),
     Bidirectional(LSTM(128)),
-    Dense(units=512, activation='relu'),
+    Dense(units=128, activation='relu'),
     Dropout(0.4),
+    Dense(1)
 	])
 \end{lstlisting}
 When utilizing LSTM for time series predictions a certain input format for data is needed. Therefore the Lambda function on line 3 is required to reshape the dimension of the used input data. 
@@ -274,7 +275,32 @@ lstm_history = lstm_booking_prediction_model.fit(
 	)
 \end{lstlisting}
 The function \verb|fit()| requires parameters like the data used for training (\verb|bookings_training_90|) as well as how many epochs are processed. One \verb|epoch| covers the process of iterating through the entire training dataset and performing forward and backward propagation as well as updating the model's parameters based on the chosen optimization algorithm.
+\newline
+When training the model using the initial parameters described during this chapter the following results are achieved:
 
+
+
+\subsection{Implementation of CNN}
+Similar to the implementation of LSTM the implementation of a CNN does not require much code. Furthermore some parts of the code itself use the same parameters and is not explained again. To initialize a CNN model the following code is required: 
+
+ \begin{lstlisting}
+#define the model 
+cnn_model = Sequential([
+    Lambda(lambda x: tf.expand_dims(x, axis=-1), input_shape=[WINDOW]),
+    Conv1D(filters=512, kernel_size=3, activation='relu'),
+    Conv1D(filters=512, kernel_size=3, activation='relu'),
+    GlobalAveragePooling1D(),
+    Flatten(),
+    Dropout(0.3),
+    Dense(512, activation='relu'),
+    Dropout(0.4),
+    Dense(1)
+])
+\end{lstlisting}
+\verb|Conv1D()| is used to add one one dimensional CL to the model. Those Layers work as described in \ref{sec:cnn}.  The \verb|filter| parameter is equivalent to the number of neurons this layer is going to use. Furthermore the kernel's size as explained in \ref{sec:cnn} is determined by the parameter \verb|kernel_size|.
+The only difference left in comparison to the LSTM layer is the FL \ref{sec:cnn}. This layer is added by utilizing the \verb|Flatten()| parameter. When it comes to compiling and fitting the model the CNN makes use of  \verb|Huber()| for its loss function and \verb|Adam()| for its optimization function contrary to the implementation of the LSTM model. Furthermore both models are initially using 100 epochs for their first training. \newline
+
+The first training results produced by the CNN model look the following: 
 
 
 
