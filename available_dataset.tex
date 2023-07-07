@@ -17,9 +17,6 @@ This chapter focuses on explaining and analysing the available data. The data is
 \section{Data Origin}
 The available dataset is gathered from a website that provides a service to find and book buses for individual journeys. This service is currently available in Austria, Germany, Switzerland and Lichtenstein. The buses itself are offered in real time by various different bus companies. Offers can vary in price which is based bus calculations which may vary from operator to operator. The data is stored in a relational database. Since the service also provides the possibility to directly book a bus, booking and corresponding user meta data is available as well. \newline
 
-
-
-
 \section{Data Structure}
 The service launched in March 2017 therefore booking data is available back to this date. Tracking the search requests was introduced in October 2020. 
 The request table itself keeps track of 40 attributes but not all of them host valuable information that could be analysed therefore only the ones which can be analysed are listed and explained below:
@@ -51,6 +48,8 @@ Whenever a booking is made the correlating data is stored within a booking table
 	\item \verb|createdAt| - At which time the booking was made.
 	\item \verb|company_id| - FK used to identify who received the booking
 	\item \verb|task_id| - FK used to link the booking to an search request 
+	\item \verb|taskTime_from| - Indicates the day of departure
+	\item \verb|basePrice_amount| - The price the customer has to pay
 \end{itemize} 
 
 \section{Data Cleansing}
@@ -91,20 +90,20 @@ Starting from March 2020 countries like Austria, Germany, Switzerland and Lichte
 	\caption{Bookings over time - [source:author]}
 	\label{fig:noAug}
 \end{figure}
-Figure \ref{fig:noAug} highlights the drop of bookings starting from March 2020 until June 2022. To achieve reliable results when utilizing this data for a time series forecasting ML model this time period needs augmentation. When analysing the chart \ref{fig:noAug} an continuous growth of bookings is visible until 2021. One way to augment the data \\citehere is calculate the average growth during this time span. To substitute the distorted data the current data is replaced by the value of the previous year. This value is then multiplied by the average growth. Furthermore missing timestamps throughout the whole time series are added with a value of zero. The following logic is applied to the data frame: 
+Figure \ref{fig:noAug} highlights the drop of bookings starting from March 2020 until June 2022. The extreme spikes which can be observed during summer 2022 is related to two events taking place in Spielberg in Austria. Both the Formula 1 as well as MotoGP utilized the service to organise the bus shuttles. All buses that were operating as shuttles were booked via busfinder. As busfinder To achieve reliable results when utilizing this data for a time series forecasting ML model this time period needs augmentation. When analysing the chart \ref{fig:noAug} an continuous growth of bookings is visible until 2021. One way to augment the data \\citehere is calculate the average growth during this time span. To substitute the distorted data the current data is replaced by the value of the previous year. This value is then multiplied by the average growth. Furthermore missing timestamps throughout the whole time series are added with a value of zero. The following logic is applied to the data frame: 
 
 \begin{lstlisting}
 df = db.get_booking_data()
 average_growth = df['bookings'].pct_change().mean()
 substitute_corona = pd.date_range(start='2020-03-01', end='2022-05-01', freq='D')
-df['date(createdAt)'] = pd.to_datetime(df['date(createdAt)'])
-df = (df.set_index('date(createdAt)')
+df['date(createdAt)'] = pd.to_datetime(df['date(taskTime_from)'])
+df = (df.set_index('date(taskTime_from)')
       .reindex(pd.date_range('2018-01-01', '2023-05-01', freq='D'))
-      .rename_axis(['date(createdAt)'])
+      .rename_axis(['date(taskTime_from)'])
       .fillna(0)
       .reset_index())
 
-df.set_index('date(createdAt)', inplace=True)
+df.set_index('date(taskTime_from)', inplace=True)
 
 for date in substitute_corona:
     year_ago = str(date - relativedelta(years=1)).split(" ")[0]
@@ -120,23 +119,3 @@ The average growth per anno is around 30\%. After applying the logic the data se
 	\label{fig:augmented_data}
 \end{figure}
 The impact of this augmentation in terms of prediction accuracy is compared in chapter \ref{chap:prediction_model}.
-
-\section{What insights can be gathered?}
-This section focuses on which potential information from the available dataset can be extracted and utilized for a reporting dashboard. Furthermore the dataset will be analysed for metrics that can support and improve the current yield management. 
-
-
-\subsection{Improving the Yield Management}
-In general Yield Management (YM) describes the way how limited resources like hotel rooms, seats within an air plane or available buses are assigned to customers by levearging the highest possible revenue. American Airlines claims that by utilizing YM they are able to increase their revenue by 500 million dollars per year \cite{ym_practice}. Before integrating YM a few considerations about the characteristics of teh provided service need to be made otherwise YM might actually cause a decrease in revenue. The following characteristics are suitable for the utilization of YM:\cite{ym_practice}
-\begin{itemize}
-  \item Storing surplus resources can either be costly or unattainable. 
-  \item Whenever future demand is uncertain commitments need to be done.
-  \item It is possible to differentiate between customer segments
-  \item A single unit can be used to provide different services 
-  \item The company is not legally limited in their actions of selling a certain service or not.
-\end{itemize}
-As YM is already in place at busfinder one of the characteristics mentioned above comes along with a high uncertainty. Although commitments for uncertain future demand are made the ability to predict future bookings would further improve the YM. Being able to predict future bookings during ordinary market conditions (e.g. no travel restrictions in place) those estimates directly can be used to influence factor of capacity management - How many buses are available? This directly influences the pricing strategy because a higher demand results in a higher price.
-
-Both Artificial Neural Networks (ANNs) and their usage for time series forecasting further evolved over the past years. Additionally libraries like tensorflow  reduce the complexity of developing ANNs. Hence this method is a suitable solution to predict future bookings. Therefore the basics of ANN and the development of two different models are explained in chapter \ref{chap:predict}.
-
-\subsection{The Averages) 
-

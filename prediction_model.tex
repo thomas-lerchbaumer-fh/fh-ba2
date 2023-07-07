@@ -185,6 +185,7 @@ By looking at the characteristics of the augmented data set shown in figure \ref
 To optimize a NN's parameters an optimizer function is required. This function updates parameters like weights based on the results provided by the loss function \cite{optimizer}. Since both NN's described in this section make use of backpropagation for their training a literature review was conducted to figure out which optimizer is keen to deliver the most accurate results. By inspecting the advantages and disadvantages proposed by these works \cite{optimizer}\cite{optimizer_1}\cite{optimizer_2} it turns out that the algorithm ADAM is a valid choice. This algorithm is characterized by achieving faster convergence compared to other algorithms. Furthermore Adam provides a decent performance for datasets with meager features.
 
 \section{Implementation}
+\label{sec:implementation}
 Both models follow the same workflow when it comes to their implementation. The workflow is highlighted in figure \ref{fig:workflow}:
 
 \begin{figure}[H]
@@ -202,10 +203,10 @@ import pandas as pd
 
 def get_booking_data():
 
-    sql = ("SELECT count(createdAt) as bookings, date(createdAt) from bookings"
-           "WHERE date(createdAt) <= DATE('2023-05-01') 
-           "and date(createdAt) >= DATE('2017-01-01')"
-           "Group By date(createdAt) order by date(createdAt) asc")
+       sql = ("SELECT count(taskFrom_time) as bookings, date(taskFrom_time) "
+           "from bookings_2 "
+           "WHERE date(taskFrom_time) <= DATE('2023-05-01') and date(taskFrom_time) >= 			DATE('2017-01-01') "
+           "Group By date(taskFrom_time) order by date(taskFrom_time) asc")
 
     res = pd.read_sql(sql, connection)
     return res
@@ -228,7 +229,7 @@ test = df[training_end:]
 \end{figure}
 With the training and test data in place the next step is to implement both models (LSTM, CNN) by utilizing the \verb|tensorflow| library. To reduce computation costs and to increase training efficiency the training data is further processed.
 \begin{lstlisting}
-WINDOW = 20  # data window of 20 days
+WINDOW = 20
 bookings_training_90 = tf.data.Dataset.from_tensor_slices(train.values)
 bookings_training_90 = bookings_training_90.window(WINDOW + 1, shift=1, drop_remainder=True)
 bookings_training_90 = bookings_training_90.flat_map(lambda x: x.batch(WINDOW + 1))
@@ -243,8 +244,7 @@ The code itself required to setup a LSTM model only requires a few input paramet
 #define the model
 lstm_booking_prediction_model = Sequential([
     Lambda(lambda x: tf.expand_dims(x, axis=-1), input_shape=[WINDOW]),
-    Bidirectional(LSTM(128, return_sequences=True, activation='tanh',recurrent_activation='sigmoid' )),
-    Bidirectional(LSTM(128)),
+    Bidirectional(LSTM(128, activation='tanh',recurrent_activation='sigmoid' )),
     Dense(units=128, activation='relu'),
     Dropout(0.4),
     Dense(1)
@@ -253,7 +253,7 @@ lstm_booking_prediction_model = Sequential([
 When utilizing LSTM for time series predictions a certain input format for data is needed. Therefore the Lambda function on line 3 is required to reshape the dimension of the used input data. 
 \verb|Bidirectional()|\footnote{\label{tf_fn}\url{https://www.tensorflow.org/api_docs/python/tf/keras/}} actually represents a wrapper for the actual layer used for this model. In this case its holding additional states and is used to created a Bi-LSTM model as described in \ref{sec:lstm}. \newline
 \verb|LSTM()|\textsuperscript{\ref{tf_fn}} contains the logic actual logic as described in \ref{sec:lstm}. Furthermore the parameter \verb|unit=128|\textsuperscript{\ref{tf_fn}} can be understand as the number of neurons used within this layer. Furthermore this model offers different kind of activation functions. By default the hyperbolic tangent (tanh)\cite{tanh} is used. Whereas the \verb|recurrent_activation| defines which functions are used for the actual gates within the module as described in \ref{sec:lstm}. Whenever creating a stacked LSTM model, which means it makes use of at least two LSTM layers the paramater \verb|return_sequences| must be set to true. Otherwise the layer's output results in a 2D tensor output which only provides information about the last timestep. This format cannot be passed on to the next LSTM layer. \newline
-\verb|Dense()| is used to implement fully connected layers whereas \verb|units| correlate to the amount of neurons used for this layer. The way this layer works is explained in section \ref{sec:cnn}. Additional the model needs to be compiled. Therefore the following code is required: 
+\verb|Dense()| is used to implement fully connected layers whereas \verb|units| correlate to the amount of neurons used for this layer The last \verb|dense(1)| layer is used to reduce the number of outputs to 1. The way this layer works is explained in section \ref{sec:cnn}. Additional the model needs to be compiled. Therefore the following code is required: 
 \begin{lstlisting}
 #compile the model 
 lstm_booking_prediction_model.compile(
@@ -281,7 +281,7 @@ When training the model using the initial parameters described during this chapt
 
 
 \subsection{Implementation of CNN}
-Similar to the implementation of LSTM the implementation of a CNN does not require much code. Furthermore some parts of the code itself use the same parameters and is not explained again. To initialize a CNN model the following code is required: 
+Similar to the implementation of LSTM the implementation of a CNN does not require much code. Furthermore some parts of the code use the same parameters. Those parameters are not explained again. To initialize a CNN model the following code is required: 
 
  \begin{lstlisting}
 #define the model 
