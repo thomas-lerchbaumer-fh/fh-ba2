@@ -262,7 +262,7 @@ lstm_booking_prediction_model.compile(
     metrics=['mae']
 	)
 \end{lstlisting}
-The Parameter \verb|loss| sets the loss function which is utilized to evaluate the models performance. The reason why \verb|Huber| is used is explained in section \ref{sec:loss_func}. Futhermore the model also requires an optimizing algorithm. This algorithm is assigned by using the \verb|optimizer| parameter. Due to the results of a literature review explained in section \ref{sec:optimize_func} Adam turned out to be the most promising candidate for this purpose. To observe the capability of learning of a given model the metric mean absolute error(mea) can be used. 
+The Parameter \verb|loss| sets the loss function which is utilized to evaluate the models performance. The reason why \verb|Huber| is used is explained in section \ref{sec:loss_func}. Futhermore the model also requires an optimizing algorithm. This algorithm is assigned by using the \verb|optimizer| parameter. Due to the results of a literature review explained in section \ref{sec:optimize_func} Adam turned out to be the most promising candidate for this purpose. To observe the capability of learning of a given model the metric mean absolute error (mea) can be used. 
 
 The next step is to start the training of the model as demonstrated below:
 \begin{lstlisting}
@@ -277,8 +277,21 @@ lstm_history = lstm_booking_prediction_model.fit(
 The function \verb|fit()| requires parameters like the data used for training (\verb|bookings_training_90|) as well as how many epochs are processed. One \verb|epoch| covers the process of iterating through the entire training dataset and performing forward and backward propagation as well as updating the model's parameters based on the chosen optimization algorithm.
 \newline
 When training the model using the initial parameters described during this chapter the following results are achieved:
+\begin{figure}[H]
+	\centering
+		\includegraphics[width=14cm]{images/lstm_1st_lr_mae}
+	\caption{Decrease of MAE and Trainig loss for 100 epochs - [source:[author]]}
+	\label{fig:training_test}
+\end{figure}
+The training loss in general indicates the performance of the model based on the training set. It is generated through the output of the applied loss function. Low values basically mean that the model is able to catch up patterns within the training set but could also indicate overfitting. This causes the model to just memorize the training set rather than learning actual patterns. Furthermore the loss indicates the amount of required epochs for the model to learn. Whenever the loss stalls or is starting to increase again the training should be stopped. The Mean Absolute Error (MAE) is another metric to observe the ability of the model to learn. The MAE is obtained by calculating the mean of actual values minus the predicted values. This result is divided by the number of observations.\cite{mae} Similar to the training loss a lower value indicates the performance of the model but the MAE needs to be interpreted in context with the range the predictions are made for. For example a MAE of 1 for predictions made in ranges between 1-2 is interpreted as poor performance, whereas a MAE of 100 for predictions made in a range between 100.000 and 1.000.000 indicates a proper result.
 
-
+\begin{figure}[H]
+	\centering
+		\includegraphics[width=14cm]{images/lstm_1_prediction}
+	\caption{Predictions on Test set from 01-01-203 to 01-05-2023 - [source:[author]]}
+	\label{fig:lstm_1_training_test}
+\end{figure}
+By looking at figure \ref{fig:lstm_1_training_test} its clear to see that the model's performance in terms of accuracy is insufficient. Investigating the training loss and MAE shows that the final MAE of around 0.5 is acceptable in context of the prediction range ranging from 1 to 17. This indicates that the model tends to overfitting as the final training loss is low as well. Section \ref{sec:improve} investigates strageties on how to improve the model's performance.
 
 \subsection{Implementation of CNN}
 Similar to the implementation of LSTM the implementation of a CNN does not require much code. Furthermore some parts of the code use the same parameters. Those parameters are not explained again. To initialize a CNN model the following code is required: 
@@ -302,9 +315,22 @@ The only difference left in comparison to the LSTM layer is the FL \ref{sec:cnn}
 
 The first training results produced by the CNN model look the following: 
 
+\begin{figure}[H]
+	\centering
+		\includegraphics[width=14cm]{images/cnn_1_mae}
+	\caption{Decrease of MAE and Trainig Loss for 100 epochs - [source:[author]]}
+	\label{fig:training_test}
+\end{figure}
 
+\begin{figure}[H]
+	\centering
+		\includegraphics[width=14cm]{images/cnn_1_prediction}
+	\caption{Predictions on Test set from 01-01-203 to 01-05-2023 - [source:[author]]}
+	\label{fig:lstm_1_training_test}
+\end{figure}
 
-\section{Reliability Comparison - LSTM, CNN}
+\section{Improving the models}
+\ref{sec:improving}
 
 \section{Model accuracy}
 Having a look at the model performance accuracy (comparing predictions of the model with already available data) , explain potential twerks that have been applied to the model itself to achieve a higher level of accuracy.
