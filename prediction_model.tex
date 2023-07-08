@@ -319,8 +319,9 @@ The first training results produced by the CNN model look the following:
 	\centering
 		\includegraphics[width=14cm]{images/cnn_1_mae}
 	\caption{Decrease of MAE and Trainig Loss for 100 epochs - [source:[author]]}
-	\label{fig:training_test}
+	\label{fig:training_test_cnn}
 \end{figure}
+When analysing the metrics in highlighted in figure \ref{fig:training_test_cnn} it is clear to see that both the training loss and the MAE are still very high after 100 epochs. This indicates that the model needs to be trained utilizing more epochs. The results of the training loss as well as the MAE are reflected also in the actual predictions made on the test set.
 
 \begin{figure}[H]
 	\centering
@@ -328,9 +329,101 @@ The first training results produced by the CNN model look the following:
 	\caption{Predictions on Test set from 01-01-203 to 01-05-2023 - [source:[author]]}
 	\label{fig:lstm_1_training_test}
 \end{figure}
+By looking at the results of the predicted values its clear to see that the model's performance is poor. During it's training the model was not capable of obtaining the trainings set characteristics. Strategies on how to potentially improve the models accuracy are discussed in ref{sec:improving} 
 
 \section{Improving the models}
-\ref{sec:improving}
+\label{sec:improving}
+There are several strategies that can be followed in order to improve a models performance. One option is to enhance the data preprocessing. Therefore the available data set is normalized. One approach that can be utilized is Min-Max Normalisation \cite{min_max}. Following this approach the original data is brought into a range from values between 0 and 1 by keeping the actual ratio of the test and training data. 
+Another approach is called feature engineering. Following this strategy further features are extracted from the available dataset. This process results in a multivariate prediction model \cite{multi}.
+Additional possibilities to enhance a model's performance is to change its architecture. This implies methods like utilizing multiple \verb|Conv1D| layers or stacking several LSTM layers. Applying this approach lead to more complex models which might improve a NN ability to find patterns within the available dataset. Similar to this approach the tuning of a model's parameters also called hyperparameter tuning.  This method applies different configurations of parameters to train the model and compares their results. Looking at the implementation of the LSTM  and CNN model described in section \ref{sec:implementation} parameters like \verb|epochs|, \verb|window|, \verb|units|(LSTM) or \verb|filters|(CNN), and \verb|Dropout|. AS there is no model that fits all purposes those parameters are updated during an iterative process. \newline
+One of the approaches to increase the models performance in this section is a combination of changing the architecture of both models as well as changing their hyper parameters. 
+
+\subsubsection{Adapting the Architecture and Hyperparameter tuning}
+This section proposes various configurations that are applied to both models in order to increase their accuracy. Therefore table \ref{tab:configs} lists the various combinations used to train the models.
+
+Conv1D(filters=512, kernel_size=3, strides=1,
+           padding='causal', activation='relu'),
+    Conv1D(filters=512, kernel_size=3, strides=1,
+           padding='causal', activation='relu'),
+    Conv1D(filters=256, kernel_size=3, strides=1,
+           padding='causal', activation='relu'),
+    GlobalAveragePooling1D(),
+    Flatten(),
+    Dense(128, activation='relu'),
+    Dropout(0.4),
+    Dense(1)
+
+
+\newsavebox{\codebox} % For saving code in the first row
+\newsavebox{\codeboxtwo} % For saving code in the second row
+\newsavebox{\codeboxthree} % lstm 3
+\newsavebox{\codeboxfour} % cnn 1
+\newsavebox{\codeboxfive} % cnn 2
+
+
+\begin{lrbox}{\codeboxfive} % Start saving into \codebox lstm1
+\begin{lstlisting}[numbers=none, basicstyle=\tiny, numbersep=0pt, xleftmargin=0pt, Conv1D(filters=512, kernel_size=3, strides=1,
+       padding='causal', activation='relu'),
+Conv1D(filters=512, kernel_size=3, strides=1,
+       padding='causal', activation='relu'),
+Conv1D(filters=256, kernel_size=3, strides=1,
+       padding='causal', activation='relu'),
+GlobalAveragePooling1D(),
+Flatten(),
+Dense(128, activation='relu'),
+Dropout(0.4),
+Dense(1)
+\end{lstlisting}
+\end{lrbox} % Stop saving into \codebox
+
+\begin{lrbox}{\codeboxfour} % Start saving into \codebox lstm1
+\begin{lstlisting}[numbers=none, basicstyle=\tiny, numbersep=0pt, xleftmargin=0pt, xrightmargin=0pt, backgroundcolor=\color{white}]
+Conv1D(filters=256, kernel_size=3, strides=1,
+       padding='causal', activation='relu')
+Conv1D(filters=256, kernel_size=3, strides=1,
+       padding='causal', activation='relu')
+GlobalAveragePooling1D()
+Flatten()
+Dense(128, activation='relu')
+Dropout(0.4)
+Dense(1)
+\end{lstlisting}
+\end{lrbox} % Stop saving into \codebox
+
+\begin{lrbox}{\codebox} % Start saving into \codebox lstm1
+\begin{lstlisting}[numbers=none, basicstyle=\tiny, numbersep=0pt, xleftmargin=0pt, xrightmargin=0pt, backgroundcolor=\color{white}]
+Bidirectional(LSTM(256, return_sequences=True))
+Bidirectional(LSTM(256))
+Dense(256, activation='relu')
+Dropout(0.4)
+Dense(1)
+\end{lstlisting}
+\end{lrbox} % Stop saving into \codebox
+
+\begin{lrbox}{\codeboxtwo} % Start saving into \codeboxtwo lstm2
+\begin{lstlisting}[numbers=none, basicstyle=\tiny, numbersep=0pt, xleftmargin=0pt, xrightmargin=0pt, backgroundcolor=\color{white}]
+Another code snippet here
+\end{lstlisting}
+\end{lrbox} % Stop saving into \codeboxtwo
+
+\begin{tabular}{|l|p{9cm}|r|r|r|}
+  \hline
+  \textbf{Type} & \textbf{Model} & \textbf{Epochs} & \textbf{Loss} & \textbf{MAE} \\
+  \hline
+  LSTM 1& \usebox{\codebox} & 150 & 0.25 & 0.45 \\
+  \hline
+  LSTM 2& \usebox{\codeboxtwo} & x & x & x \\
+  \hline
+  LSTM 3& \usebox{\codeboxtwo} & x & x & x \\
+  \hline
+    CNN 1 & \usebox{\codeboxfour} & 250 & 0.81 & 1.19 \\
+  \hline
+   CNN 2& \usebox{\codeboxfive} & 350 & x & x \\
+  \hline
+   CNN 3& \usebox{\codeboxtwo} & x & x & x \\
+  \hline
+\end{tabular}
+
 
 \section{Model accuracy}
 Having a look at the model performance accuracy (comparing predictions of the model with already available data) , explain potential twerks that have been applied to the model itself to achieve a higher level of accuracy.
