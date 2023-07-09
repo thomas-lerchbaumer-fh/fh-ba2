@@ -12,14 +12,22 @@
 
 \chapter{Implementation of Averages and Grouping}
 \label{chap:analytical_dashboard}
-
+This section focuses on the implementation of various groupings as well as their visualization. As the analytical dashboard is web based a short overview about its technical setup is given in section \ref{sec:tech_set}.
 
 \section{Technical Setup}
-Explain the basic setup and used technologies for used for the analytical web based dashbaord 
+\label{sec:tech_set}
+As those implementations will contribute to an analytical dashboard the visualization of the prepared data are implemented using React. For each grouping a separate React component is created. Communication between the front- and backend is accomplished using a Rest interface. 
+
+\begin{itemize}
+\item  \verb|React|\footnote{https://react.dev/} - used to Visualize
+\item \verb|Python|\footnote{https://www.python.org/} - used to implement the grouping logic
+\item \verb|fastapi|\footnote{https://fastapi.tiangolo.com/} - Rest interface (Connection between Backend and Frontend) 
+\item \verb|geopy|\footnote{https://geopy.readthedocs.io/en/stable/} - Used for calculations on latitude and longitude 
+\end{itemize}
 
 
-\section{Applied Statistical Models}
-explain which attributes also provide additional information that can be gathered from the dataset, which models were applied (algorithms) 
+\section{Grouping Implementation}
+ 
 
 \section{Visualisation techniques}
 which plots etc (and why) are used to display the gathered information 

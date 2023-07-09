@@ -174,8 +174,8 @@ The loss function is one crucial element as they evaluate the accuracy of the pr
 		$\epsilon$-insensitive & Focuses on samples with large prediction errors \\
 		\hline	
 		\end{tabularx}
-	\caption{Loss functions and their characteristics - [source:\cite{loss_func}]}
 	\label{tab:loss_function}
+	\caption{Loss functions and their characteristics - [source:\cite{loss_func}]}
 \end{table*}
 
 By looking at the characteristics of the augmented data set shown in figure \ref{fig:augmented_data} it is clear to see that the dataset itself has got outliers repeating themselves every year. To avoid a strong focus on those peaks both models are initial trained utilizing the Adam loss function.
@@ -334,25 +334,13 @@ By looking at the results of the predicted values its clear to see that the mode
 \section{Improving the models}
 \label{sec:improving}
 There are several strategies that can be followed in order to improve a models performance. One option is to enhance the data preprocessing. Therefore the available data set is normalized. One approach that can be utilized is Min-Max Normalisation \cite{min_max}. Following this approach the original data is brought into a range from values between 0 and 1 by keeping the actual ratio of the test and training data. 
-Another approach is called feature engineering. Following this strategy further features are extracted from the available dataset. This process results in a multivariate prediction model \cite{multi}.
+Another approach is called feature engineering \cite{feature_eng}. Following this strategy further features are extracted from the available dataset. This process results in a multivariate prediction model \cite{multi}.
 Additional possibilities to enhance a model's performance is to change its architecture. This implies methods like utilizing multiple \verb|Conv1D| layers or stacking several LSTM layers. Applying this approach lead to more complex models which might improve a NN ability to find patterns within the available dataset. Similar to this approach the tuning of a model's parameters also called hyperparameter tuning.  This method applies different configurations of parameters to train the model and compares their results. Looking at the implementation of the LSTM  and CNN model described in section \ref{sec:implementation} parameters like \verb|epochs|, \verb|window|, \verb|units|(LSTM) or \verb|filters|(CNN), and \verb|Dropout|. AS there is no model that fits all purposes those parameters are updated during an iterative process. \newline
 One of the approaches to increase the models performance in this section is a combination of changing the architecture of both models as well as changing their hyper parameters. 
 
-\subsubsection{Adapting the Architecture and Hyperparameter tuning}
+\subsection{Adapting the Architecture and Hyperparameter tuning}
+\label{sec:hyper}
 This section proposes various configurations that are applied to both models in order to increase their accuracy. Therefore table \ref{tab:configs} lists the various combinations used to train the models.
-
-Conv1D(filters=512, kernel_size=3, strides=1,
-           padding='causal', activation='relu'),
-    Conv1D(filters=512, kernel_size=3, strides=1,
-           padding='causal', activation='relu'),
-    Conv1D(filters=256, kernel_size=3, strides=1,
-           padding='causal', activation='relu'),
-    GlobalAveragePooling1D(),
-    Flatten(),
-    Dense(128, activation='relu'),
-    Dropout(0.4),
-    Dense(1)
-
 
 \newsavebox{\codebox} % For saving code in the first row
 \newsavebox{\codeboxtwo} % For saving code in the second row
@@ -360,21 +348,44 @@ Conv1D(filters=512, kernel_size=3, strides=1,
 \newsavebox{\codeboxfour} % cnn 1
 \newsavebox{\codeboxfive} % cnn 2
 
+\newsavebox{\codeboxsix} % cnn 3
 
-\begin{lrbox}{\codeboxfive} % Start saving into \codebox lstm1
-\begin{lstlisting}[numbers=none, basicstyle=\tiny, numbersep=0pt, xleftmargin=0pt, Conv1D(filters=512, kernel_size=3, strides=1,
-       padding='causal', activation='relu'),
-Conv1D(filters=512, kernel_size=3, strides=1,
-       padding='causal', activation='relu'),
+\begin{lrbox}{\codeboxsix} % Start saving into \codebox lstm1
+\begin{lstlisting}[numbers=none, basicstyle=\tiny, numbersep=0pt, xleftmargin=0pt, xrightmargin=0pt, backgroundcolor=\color{white}]
+Conv1D(filters=256, kernel_size=3, strides=1, 
+	   padding='causal', activation='relu')
+BatchNormalization()
 Conv1D(filters=256, kernel_size=3, strides=1,
-       padding='causal', activation='relu'),
-GlobalAveragePooling1D(),
-Flatten(),
-Dense(128, activation='relu'),
-Dropout(0.4),
+	   padding='causal',activation='relu')
+BatchNormalization()
+Conv1D(filters=256, kernel_size=3, strides=1, 
+	   padding='causal', activation='relu')
+BatchNormalization()
+Flatten()
+Dense(256, activation='relu')
+Dropout(0.4)
 Dense(1)
 \end{lstlisting}
 \end{lrbox} % Stop saving into \codebox
+
+
+
+\begin{lrbox}{\codeboxfive} % Start saving into \codebox lstm1
+\begin{lstlisting}[numbers=none, basicstyle=\tiny, numbersep=0pt, xleftmargin=0pt, xrightmargin=0pt, backgroundcolor=\color{white}]
+Conv1D(filters=512, kernel_size=3, strides=1,
+       padding='causal', activation='relu')
+Conv1D(filters=512, kernel_size=3, strides=1,
+       padding='causal', activation='relu')
+Conv1D(filters=512, kernel_size=3, strides=1,
+       padding='causal', activation='relu')
+GlobalAveragePooling1D()
+Flatten()
+Dense(128, activation='relu')
+Dropout(0.4)
+Dense(1)
+\end{lstlisting}
+\end{lrbox} % Stop saving into \codebox
+
 
 \begin{lrbox}{\codeboxfour} % Start saving into \codebox lstm1
 \begin{lstlisting}[numbers=none, basicstyle=\tiny, numbersep=0pt, xleftmargin=0pt, xrightmargin=0pt, backgroundcolor=\color{white}]
@@ -406,6 +417,7 @@ Another code snippet here
 \end{lstlisting}
 \end{lrbox} % Stop saving into \codeboxtwo
 
+\begin{table}[H]
 \begin{tabular}{|l|p{9cm}|r|r|r|}
   \hline
   \textbf{Type} & \textbf{Model} & \textbf{Epochs} & \textbf{Loss} & \textbf{MAE} \\
@@ -418,13 +430,72 @@ Another code snippet here
   \hline
     CNN 1 & \usebox{\codeboxfour} & 250 & 0.81 & 1.19 \\
   \hline
-   CNN 2& \usebox{\codeboxfive} & 350 & x & x \\
+   CNN 2& \usebox{\codeboxfive} & 350 & 0.25 & 0.51 \\
   \hline
-   CNN 3& \usebox{\codeboxtwo} & x & x & x \\
+   CNN 3& \usebox{\codeboxsix} & 500 & 0.21 & 0.43 \\
   \hline
 \end{tabular}
+\caption{Various model combinations including Epochs, final loss and final MAE - [source:[author]]}
+	\label{tab:models}
+\end{table}
 
+By observing the results from table \ref{tab:models} it is clear to see that by increasing the epochs for approaches using CNN the actual loss as well as the MAE decreased. Never the less as illustrated in figure the model still was not able to catch up the characteristics of the training set. Regarding the LSTM model utilizing 220 epochs the lowest values for loss and MAE where achieved. Neither increasing nor decreasing the models complexities in terms of its architecture supported the model to further improve its accuracy for predictions based on the test set. 
+This behaviour indicates that only one feature might be insufficient for the models to find patterns that increase their ability to predict demand for buses for a certain day. 
+Therefore section \ref{sec:feature_eng} investigates which potential features can be extracted from the current dataset as well as their impact on prediction accuracy. 
 
-\section{Model accuracy}
-Having a look at the model performance accuracy (comparing predictions of the model with already available data) , explain potential twerks that have been applied to the model itself to achieve a higher level of accuracy.
+\subsection{Feature Engineering}
+\label{sec:feature_eng}
+Feature Engineering (FE) is used to create new input values also called features that are used to enhance the capability of learning. \cite{feature_eng_2} The approaches before used the whole timestamp \verb|tasTime_from| resulting that only one feature is available to train the models.  
+Looking at the structure of a date like 2023-01-01 additional features become visible  that are usable to train out models.  The structure essentially hosts aspects like \verb|day of the month|, \verb|month|,\verb|year|, \verb|quarter of the year| as well as \verb|week of the year|. By extracting those characteristics form every single date more features become available that can be utilized to train the model. As there are certain seasonal patterns that can be observed when looking at the booking data those features provide additional context that can be utilized by the model during training to improve its ability to detect certain patterns. As the LSTM model in general looks like the more suitable candidate due to the past results it provided during section \ref{sec:implementation} and \ref{sec:hyper} the approach of feature engineering is only applied onto the LSTM approach.
+\newline
+In order to extract additional features the following code is applied: 
+\begin{lstlisting}
+df['month'] = df.index.month
+df['day'] = df.index.day
+df['dayofweek'] = df.index.dayofweek
+df['quarter'] = df.index.quarter
+\end{lstlisting}
+The initial dataframe (df) remains untouched and got the same structure as in section \ref{sec:implementation}. As the index of the \verb|df| is initialized as \verb|pd.to_datetime()| operations like \verb|index.month|, \verb|index.day| etc. become available. Those functions extract the values based on each index available of within the df. 
+For the initial training of the multivariant LSTM model the following architecture and parameters are used. 
+\begin{lstlisting}
+lstm_model = Sequential([
+Bidirectional(LSTM(128,return_sequences=True,
+			  input_shape=(X_train.shape[1], X_train.shape[2]))),
+Bidirectional(LSTM(128,
+			  input_shape=(X_train.shape[1],X_train.shape[2]))),
+Dense(1)
+])
 
+lstm_model.compile(
+    loss=Huber(),
+    optimizer=Adam(),
+    metrics=['mae']
+)
+
+lstm_model.fit(
+X_train, 
+Y_train, 
+epochs=120, 
+)
+\end{lstlisting}
+As this model now utilizes multiple features the parameter \verb|input_shape| needs to be set.  \verb|X_train.shape[1]| represents the number of time steps whereas \verb|X_train.shape[2]| represents the number of features utilized for each time step. Furthermore \verb|lstm_model.fit| receives now two input values whereas \verb|X_train| indicates the input features and \verb|Y_train| represents the actual output of a certain time step. For previous models only one input was required due to the way the data is structured. 
+The training results of the model are highlighted in figure \ref{fig:lstm_multi_1_mae} and \ref{fig:lstm_multi_1_prediction} 
+\begin{figure}[H]
+	\centering
+		\includegraphics[width=14cm]{images/lstm_multi_1_mae}
+	\caption{Change of Loss and MAE - [source:[author]]}
+	\label{fig:lstm_multi_1_mae}
+\end{figure}
+More context here (comarison to former model)
+\begin{figure}[H]
+	\centering
+		\includegraphics[width=14cm]{images/lstm_multi_1_prediction}
+	\caption{Predictions on test set from 01-01-203 to 01-05-2023 - [source:[author]]}
+	\label{fig:lstm_multi_1_prediction}
+\end{figure}
+%One observation that can be made is that the final loss as well as the final MAE are almost identical to the results achieved when utilizing a single feature LSTM
+Interpreting the result + tell reasons why 
+
+\section{Predictions And Yield Management}
+MORE TO COME 
+This section covers the relation of utilization of buses and YieldManagement, furthermore the the timesteps for future bookings are discussed --> calculating the avg upfront time for a booking, If model is able to predict bookings based in the upfront time --> valid option otherwise not 
