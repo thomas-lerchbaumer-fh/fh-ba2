@@ -482,20 +482,19 @@ As this model now utilizes multiple features the parameter \verb|input_shape| ne
 The training results of the model are highlighted in figure \ref{fig:lstm_multi_1_mae} and \ref{fig:lstm_multi_1_prediction} 
 \begin{figure}[H]
 	\centering
-		\includegraphics[width=14cm]{images/lstm_multi_1_mae}
+		\includegraphics[width=12cm]{images/lstm_multi_1_mae}
 	\caption{Change of Loss and MAE - [source:[author]]}
 	\label{fig:lstm_multi_1_mae}
 \end{figure}
-More context here (comarison to former model)
+Both the final loss (0.25) and MAE (0.30) are almost identical to the results achieved for the previous models. The major difference is the actual prediction results on the test data highlighted in figure  \ref{fig:lstm_multi_1_prediction}. It is clear to see that the model's perfomance increased dramatically. This behaviour indicates that the models were overfitting the data and not being able to create accurate predictions on the test data. By increase the context to the LSTM by extracting additional features the models performance on unseen data is increased as well. 
 \begin{figure}[H]
 	\centering
 		\includegraphics[width=14cm]{images/lstm_multi_1_prediction}
 	\caption{Predictions on test set from 01-01-203 to 01-05-2023 - [source:[author]]}
 	\label{fig:lstm_multi_1_prediction}
 \end{figure}
-%One observation that can be made is that the final loss as well as the final MAE are almost identical to the results achieved when utilizing a single feature LSTM
-Interpreting the result + tell reasons why 
+Looking at the results in figure \ref{fig:lstm_multi_1_prediction} the enhanced LSTM model is capable of reliably predicting the future bus utilization for the dates ranging from one to five months. Section \ref{sec:pred_and_ym} discusses the achieved results and weather or not they the model can be used to support the YM.
 
 \section{Predictions And Yield Management}
-MORE TO COME 
-This section covers the relation of utilization of buses and YieldManagement, furthermore the the timesteps for future bookings are discussed --> calculating the avg upfront time for a booking, If model is able to predict bookings based in the upfront time --> valid option otherwise not 
+\label{sec:pred_and_ym}
+To determine weather or not the model can be utilized to support the YM knowledge about how far in advanced buses are booked is crucial. By computing the median timespan utilizing the attributes \verb|createdAt| and \verb|tasTime_from| this information can be gathered from the available dataset. The median timespan between \verb|createdAt| and \verb|taskFrom_time| is around 38 days. As the model is able to provide adequate results for at least 5 months into the future the model is suitable for the purpose of supporting the YM.  More to come --> caution should be taken etc.
