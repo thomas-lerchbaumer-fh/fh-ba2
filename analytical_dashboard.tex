@@ -27,10 +27,12 @@ As those implementations will contribute to an analytical dashboard the visualiz
 
 
 \section{Grouping Implementation}
+
+\subsubsection{Grouping by Geographical Attributes}
 The dataset for bus search requests (after cleaning) currently got around 230.000 entries. As the geographical calculations as well as the grouping logic are computational expensive tasks it is not feasible to redo this logic on every request. To enable real time requests with various filters onto the grouped data an additional database table. The table consists of two attributes: 
 \begin{itemize}
-\item \verb|parent_id (PK & FK - search_requests(task_id)| - parent that defines a region 
-\item \verb|child_id (FK - search_requests(task_id)| - entries that belong to a certain region  
+\item \verb|parent_id (FK - search_requests(task_id)| - parent that defines a region 
+\item \verb|child_id (FK - search_requests(task_id)| - entries that belong to a certain parent region  
 \end{itemize}
 This design comes along with several advantages. The logic for analytical requests and the grouping logic can be separated. Furthermore new entries for groupings can be added to a potential parent in a more efficient way as those entries only need to be compared to the attributes of \verb|parent_id|.
 
@@ -54,7 +56,13 @@ for point_a in data:
           res[key].append(point_b)
           ignore_list.add(point_b['id'])  # Add point_b['id'] to ignore_list
 \end{lstlisting}
-This logic performs the comparison between two geographical entries. Whenever \verb|point\_b| is within a 20km radius of the departure and destination area from \verb|point\_a| \verb|point\_b| is added to the group from \verb|point\_a|.
+This logic performs the comparison between two geographical entries. Whenever \verb|point\_b| is within a 20km radius of the departure and destination area from \verb|point\_a| \verb|point\_b| is added to the group from \verb|point\_a|. Utilizing this design makes it possible to still include filters like date ranges to query date for a certain time range. Furthermore the averages for attributes explained in section \ref{sec:averages} can be utilized and compared to evaluate certain trends. By adjusting the logic above and removing the constraint that both destination and departure has to be within a certain range this data can further be grouped into popular destination places as well as popular departure places. Depending on the grouping technique various insights can be gathered. By analysing grouped data that mark routes (same departure/destination radius) the pricing strategy for routes with high demand can be adapted. Whereas analysing the grouping on departure places with high traffic bus operators might consider to expand their maximum approaching distance. Furthermore by changing the way how the data is fetched from the database by querying results where no bus was offered \verb|amountSearchResults == 0| a different grouping becomes available for analysing. 
+
+\subsubsection{Grouping by Time}
+
+
+
+
 
 
 \section{Visualisation techniques}
