@@ -450,6 +450,7 @@ Looking at the structure of a date like 2023-01-01 additional features become vi
 \newline
 In order to extract additional features the following code is applied: 
 \begin{lstlisting}
+***********PLACEHOLDER*************************
 df['month'] = df.index.month
 df['day'] = df.index.day
 df['dayofweek'] = df.index.dayofweek
@@ -458,6 +459,8 @@ df['quarter'] = df.index.quarter
 The initial dataframe (df) remains untouched and got the same structure as in section \ref{sec:implementation}. As the index of the \verb|df| is initialized as \verb|pd.to_datetime()| operations like \verb|index.month|, \verb|index.day| etc. become available. Those functions extract the values based on each index available of within the df. 
 For the initial training of the multivariant LSTM model the following architecture and parameters are used. 
 \begin{lstlisting}
+***********PLACEHOLDER*************************
+
 lstm_model = Sequential([
 Bidirectional(LSTM(128,return_sequences=True,
 			  input_shape=(X_train.shape[1], X_train.shape[2]))),
@@ -497,4 +500,5 @@ Looking at the results in figure \ref{fig:lstm_multi_1_prediction} the enhanced 
 
 \section{Predictions And Yield Management}
 \label{sec:pred_and_ym}
-To determine weather or not the model can be utilized to support the YM knowledge about how far in advanced buses are booked is crucial. By computing the median timespan utilizing the attributes \verb|createdAt| and \verb|tasTime_from| this information can be gathered from the available dataset. The median timespan between \verb|createdAt| and \verb|taskFrom_time| is around 38 days. As the model is able to provide adequate results for at least 5 months into the future the model is suitable for the purpose of supporting the YM.  More to come --> caution should be taken etc.
+To determine weather or not the model can be utilized to support the YM knowledge about how far in advanced buses are booked is crucial. By computing the median timespan utilizing the attributes \verb|createdAt| and \verb|tasTime_from| this information can be gathered from the available dataset. The median timespan between \verb|createdAt| and \verb|taskFrom_time| is around 38 days. As the model is able to provide adequate results for at least 5 months into the future the model is suitable for the purpose of supporting the YM.  Those predictions in addition to bookings already made for a certain date can be used  to adapt the pricing strategy.
+The model can be a powerful tool utilized for YM but certain security mechanisms need to be set in place. Furthermore the model requires continuous training on new data that becomes available otherwise the accuracy on long-term predictions might decrease. 
