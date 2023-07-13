@@ -27,7 +27,35 @@ As those implementations will contribute to an analytical dashboard the visualiz
 
 
 \section{Grouping Implementation}
- 
+The dataset for bus search requests (after cleaning) currently got around 230.000 entries. As the geographical calculations as well as the grouping logic are computational expensive tasks it is not feasible to redo this logic on every request. To enable real time requests with various filters onto the grouped data an additional database table. The table consists of two attributes: 
+\begin{itemize}
+\item \verb|parent_id (PK & FK - search_requests(task_id)| - parent that defines a region 
+\item \verb|child_id (FK - search_requests(task_id)| - entries that belong to a certain region  
+\end{itemize}
+This design comes along with several advantages. The logic for analytical requests and the grouping logic can be separated. Furthermore new entries for groupings can be added to a potential parent in a more efficient way as those entries only need to be compared to the attributes of \verb|parent_id|.
+
+For geographical grouping the following logic is applied:
+\begin{lstlisting}
+radius = 20 # in km
+res = collections.defaultdict(list)
+ignore_list = set()
+for point_a in data:
+   if point_a['id'] in ignore_list:  # Skip if point_b['id'] is in ignore_list
+      continue
+   tmp_point_a_dep = tuple((point_a['taskFrom_lng'], point_a['taskFrom_lat']))
+   tmp_point_a_dest = tuple((point_a['taskTo_lng'], point_a['taskTo_lat']))
+   for point_b in data:
+	   tmp_point_b_dep = tuple((point_b['taskFrom_lng'], point_b['taskFrom_lat']))
+       tmp_point_b_dest = tuple((point_b['taskTo_lng'], point_b['taskTo_lat']))
+       actual_distance_dep = distance.great_circle(tmp_point_a_dep, tmp_point_b_dep).km
+       actual_distance_dest = distance.great_circle(tmp_point_a_dest, tmp_point_b_dest).km
+       if actual_distance_dep < radius and actual_distance_dest < radius:
+          key = point_a['id']
+          res[key].append(point_b)
+          ignore_list.add(point_b['id'])  # Add point_b['id'] to ignore_list
+\end{lstlisting}
+This logic performs the comparison between two geographical entries. Whenever \verb|point\_b| is within a 20km radius of the departure and destination area from \verb|point\_a| \verb|point\_b| is added to the group from \verb|point\_a|.
+
 
 \section{Visualisation techniques}
 which plots etc (and why) are used to display the gathered information 
