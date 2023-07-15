@@ -58,18 +58,58 @@ for point_a in data:
 \end{lstlisting}
 This logic performs the comparison between two geographical entries. Whenever \verb|point\_b| is within a 20km radius of the departure and destination area from \verb|point\_a| \verb|point\_b| is added to the group from \verb|point\_a|. Utilizing this design makes it possible to still include filters like date ranges to filter groupings by date. Additional a trip is added to an ignore list to avoid micro groupings as some points might added to multiple groups. Furthermore the averages for attributes explained in section \ref{sec:averages} can be utilized and compared to evaluate certain trends. By adjusting the logic above and removing the constraint that both destination and departure has to be within a certain range this data can further be grouped into popular destination places as well as popular departure places. Depending on the grouping technique various insights can be gathered. By analysing grouped data that mark routes (same departure/destination radius) the pricing strategy for routes with high demand can be adapted. Whereas analysing the grouping on departure places with high traffic bus operators might consider to expand their maximum approaching distance. Furthermore by changing the way how the data is fetched from the database by querying results where no bus was offered \verb|amountSearchResults == 0| a different grouping becomes available for analysing. 
 \subsubsection{Visualization}
-Depending on how the entries are grouped different Visualization techniques are applied. To detect departure areas with high demand a heatmap is utilized. Therefore a interactive map is utilized. Onto this map areas with high demand are plotted. Furthermore a color scheme is applied as shown in figure. 
+Depending on how the entries are grouped different Visualization techniques are applied. To detect departure areas with high demand a heatmap is utilized. Therefore a interactive map is utilized. Onto this map areas with high demand are plotted following a color scheme. Red circles indicate high demand whereas blue areas indicate areas with less demand as shown in figure \ref{fig:heatmap_dep}. Furthermore this visualization can be filtered by applying date ranges. Additionally areas with high demand are displayed in a table including total count of requests for a certain area, average pax as well as the average travel distance.
+\newline
+As a heatmap is not suitable to visualize the grouped routes those groupings are displayed using a table. Additional the table is filterable by date in order to be able to analyse the data split up into certain time periods. Furthermore the table hosts information about average pax and average travel distance. 
+\begin{figure}[H]
+	\centering
+		\includegraphics[width=15cm]{images/heatmap_dep}
+	\caption{Interactive heatmap highlighting departure places with high demand - [source:[author]]}
+	\label{fig:heatmap_dep}
+\end{figure}
 
 
+\subsection{Grouping by Time}
+In contrast to geographical grouping, groupings by time do not require a table within the database in order to process requests in real time. To group requests by time the following logic is applied to the fetched data: 
+\begin{lstlisting}
+def group_requests_by_time(data):
+    df = pd.DataFrame(data)
+    df = pd.to_datetime(df[0])
+    grouped = df.groupby(df.dt.hour).count()
+    for name in grouped.index:
+        tmp = {"x": str(name) + ":00", "y": int(grouped.loc[name])}
+        res[0]['data'].append(tmp)
+    return res
+\end{lstlisting}
+To group search requests by days the following logic is applied: 
+\begin{lstlisting}
+def group_requests_by_day(data):
+    data_format = pd.DataFrame(data)
+    data_format = pd.to_datetime(data_format[0], format='%Y-%m-%d %H:%M:%S')
+    grouped = data_format.groupby([data_format.dt.year, data_format.dt.month, data_format.dt.day]).count()
+    res = []
+    for name in grouped.index:
+        date = str(name[0]) + "-" + str(name[1]) + "-" + str(name[2])
+        tmp = {"value": int(grouped.loc[name]), "day": date}
+        res.append(tmp)
+    res = sorted(res, key=lambda x: x['day'])
+    return res
+\end{lstlisting}
+The information gathered from those groupings can be utilized to support the scheduling of future ad campaigns.
 
+\subsubsection{Visualization}
+The hourly groupings are visualized using a line chart as demonstrated in figure \ref{fig:hourly_grouping}.
+\begin{figure}[H]
+	\centering
+		\includegraphics[width=15cm]{images/requests_hour}
+	\caption{Requests grouped on hourly basis- [source:[author]]}
+	\label{fig:hourly_grouping}
+\end{figure}
 
-\subsubsection{Grouping by Time}
-
-
-
-
-
-
-\section{Visualisation techniques}
-which plots etc (and why) are used to display the gathered information 
+\begin{figure}[H]
+	\centering
+		\includegraphics[width=15cm]{images/request_calendar}
+	\caption{Requests grouped by date - [source:[author]]}
+	\label{fig:hourly_grouping}
+\end{figure}
 
