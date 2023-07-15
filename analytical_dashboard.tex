@@ -95,8 +95,7 @@ def group_requests_by_day(data):
     res = sorted(res, key=lambda x: x['day'])
     return res
 \end{lstlisting}
-The information gathered from those groupings can be utilized to support the scheduling of future ad campaigns.
-
+Depending on which attribute e.g. \verb|createdAt| \verb|taskFrom_time| are fetched from the database different groupings become available. Both attributes provide valuable information. When the data is grouped by utilizing the attribute \verb|createdAt| the success rate of previous marketing campaigns can be evaluated. Furthermore this information can be consulted to plan future marketing campaigns. By grouping the data using the attribute \verb|taskFrom_time| seasonal patterns become visible as shown in \ref{fig:dep_grouping}
 \subsubsection{Visualization}
 The hourly groupings are visualized using a line chart as demonstrated in figure \ref{fig:hourly_grouping}.
 \begin{figure}[H]
@@ -105,11 +104,19 @@ The hourly groupings are visualized using a line chart as demonstrated in figure
 	\caption{Requests grouped on hourly basis- [source:[author]]}
 	\label{fig:hourly_grouping}
 \end{figure}
-
+By analysing figure \ref{fig:hourly_grouping} the highest the most search requests are made at around 9am. By hovering over each data point the amount of search requests become visible. 
+\newline
+The grouping by day is visualized by an heatmap mapped to an calendar. By investigating the results for different years a pattern become visible. Most of the requests are made starting from May until July. 
 \begin{figure}[H]
 	\centering
-		\includegraphics[width=15cm]{images/request_calendar}
-	\caption{Requests grouped by date - [source:[author]]}
+		\includegraphics[width=15cm]{images/grouping_by_taskFrom}
+	\caption{Daily grouping of Departure Dates- [source:[author]]}
 	\label{fig:hourly_grouping}
 \end{figure}
 
+\begin{figure}[H]
+	\centering
+		\includegraphics[width=15cm]{images/grouping_by_created_at}
+	\caption{Daily grouping of when search requests are made- [source:[author]]}
+	\label{fig:hourly_grouping}
+\end{figure}
