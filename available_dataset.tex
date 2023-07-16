@@ -57,7 +57,7 @@ Whenever a booking is made the correlating data is stored within a booking table
 During this process the available data is investigated for irregularities that cause distortion when applying statistical models. 
 
 Search requests are tracked whenever a user opens the service and searches for a certain connection. Given that behaviour it may occur that a user searches for the same connection within a short time window. This behaviour results in the need of de-duplication to avoid bias. To filter out duplicates the attributes \verb|ipHash|, \verb|createdAt|, \verb|taskFrom_address| and \verb|taskTo_address|. A search request is considered as non duplicate whenever the timespan between equal entries is larger than one hour. 
-To pre-process the data the following logic is applied once //todoChange: 
+To pre-process the data the following logic is applied once.
 \begin{lstlisting}
     query = '''
     DELETE t1
@@ -75,11 +75,9 @@ To pre-process the data the following logic is applied once //todoChange:
     cursor.execute(query, (timeframe,))
     connection.commit()
 \end{lstlisting}
+The logic above compares all entries based on the attributes mentioned above removes equal entries that are within a timespan of 1 hour. The dataset currently got around 324.000 entries. By applying this logic the entries are reduced by around 122.000. 
 
-//todo more explanation
-The logic above compares all entries based on the attributes mentioned above removes equal entries that are within a timespan of 1 hour. 
-
-Regarding validation and norming the available data present in both tables no actions are required due to fact that attributes that do not meet their defined data types are not stored in first place. 
+To validate and norm the available data present in both tables no actions are required due to fact that attributes that do not meet their defined data types are not stored in first place. 
 
 \section{Data Augmentation}
 \label{sec:data_aug}
@@ -118,3 +116,4 @@ The average growth per anno is around 30\%. After applying the logic the data se
 	\caption{Augmented Data Set - [source:author]}
 	\label{fig:augmented_data}
 \end{figure}
+This step is necessary because otherwise seasonal trends during the pandemic are available for the model. This directly influences the performance of the model \cite{data_qual}.
