@@ -279,7 +279,7 @@ The function \verb|fit()| requires parameters like the data used for training (\
 When training the model using the initial parameters described during this chapter the following results are achieved:
 \begin{figure}[H]
 	\centering
-		\includegraphics[width=14cm]{images/lstm_1st_lr_mae}
+		\includegraphics[width=14cm]{images/lstm_1_paper_training}
 	\caption{Decrease of MAE and Trainig loss for 100 epochs - [source:[author]]}
 	\label{fig:training_test}
 \end{figure}
@@ -287,7 +287,7 @@ The training loss in general indicates the performance of the model based on the
 
 \begin{figure}[H]
 	\centering
-		\includegraphics[width=14cm]{images/lstm_1_prediction}
+		\includegraphics[width=14cm]{images/paper_1_lstm_1_prediction}
 	\caption{Predictions on Test set from 01-01-203 to 01-05-2023 - [source:[author]]}
 	\label{fig:lstm_1_training_test}
 \end{figure}
@@ -298,17 +298,15 @@ Similar to the implementation of LSTM the implementation of a CNN does not requi
 
  \begin{lstlisting}
 #define the model 
-cnn_model = Sequential([
     Lambda(lambda x: tf.expand_dims(x, axis=-1), input_shape=[WINDOW]),
-    Conv1D(filters=512, kernel_size=3, activation='relu'),
-    Conv1D(filters=512, kernel_size=3, activation='relu'),
+    Conv1D(filters=128, kernel_size=10, strides=1,
+           padding='causal', activation='relu'),
+    Conv1D(filters=128, kernel_size=10, strides=1,
+           padding='causal', activation='relu'),
     GlobalAveragePooling1D(),
     Flatten(),
-    Dropout(0.3),
-    Dense(512, activation='relu'),
     Dropout(0.4),
     Dense(1)
-])
 \end{lstlisting}
 \verb|Conv1D()| is used to add one one dimensional CL to the model. Those Layers work as described in \ref{sec:cnn}.  The \verb|filter| parameter is equivalent to the number of neurons this layer is going to use. Furthermore the kernel's size as explained in \ref{sec:cnn} is determined by the parameter \verb|kernel_size|.
 The only difference left in comparison to the LSTM layer is the FL \ref{sec:cnn}. This layer is added by utilizing the \verb|Flatten()| parameter. When it comes to compiling and fitting the model the CNN makes use of  \verb|Huber()| for its loss function and \verb|Adam()| for its optimization function contrary to the implementation of the LSTM model. Furthermore both models are initially using 100 epochs for their first training. \newline
@@ -317,7 +315,7 @@ The first training results produced by the CNN model look the following:
 
 \begin{figure}[H]
 	\centering
-		\includegraphics[width=14cm]{images/cnn_1_mae}
+		\includegraphics[width=14cm]{images/cnn_model_1_loss}
 	\caption{Decrease of MAE and Trainig Loss for 100 epochs - [source:[author]]}
 	\label{fig:training_test_cnn}
 \end{figure}
@@ -362,7 +360,6 @@ Conv1D(filters=256, kernel_size=3, strides=1,
 	   padding='causal', activation='relu')
 BatchNormalization()
 Flatten()
-Dense(256, activation='relu')
 Dropout(0.4)
 Dense(1)
 \end{lstlisting}
@@ -372,17 +369,18 @@ Dense(1)
 
 \begin{lrbox}{\codeboxfive} % Start saving into \codebox lstm1
 \begin{lstlisting}[numbers=none, basicstyle=\tiny, numbersep=0pt, xleftmargin=0pt, xrightmargin=0pt, backgroundcolor=\color{white}]
-Conv1D(filters=512, kernel_size=3, strides=1,
-       padding='causal', activation='relu')
-Conv1D(filters=512, kernel_size=3, strides=1,
-       padding='causal', activation='relu')
-Conv1D(filters=512, kernel_size=3, strides=1,
-       padding='causal', activation='relu')
-GlobalAveragePooling1D()
-Flatten()
-Dense(128, activation='relu')
-Dropout(0.4)
-Dense(1)
+    Conv1D(filters=64, kernel_size=10, strides=1,
+           padding='causal', activation='relu'),
+    Dropout(0.2),
+    Conv1D(filters=64, kernel_size=10, strides=1,
+           padding='causal', activation='relu'),
+    Dropout(0.2),
+    Conv1D(filters=32, kernel_size=10, strides=1,
+           padding='causal', activation='relu'),
+    GlobalAveragePooling1D(),
+    Flatten(),
+    Dropout(0.1),
+    Dense(1)
 \end{lstlisting}
 \end{lrbox} % Stop saving into \codebox
 
@@ -395,7 +393,6 @@ Conv1D(filters=256, kernel_size=3, strides=1,
        padding='causal', activation='relu')
 GlobalAveragePooling1D()
 Flatten()
-Dense(128, activation='relu')
 Dropout(0.4)
 Dense(1)
 \end{lstlisting}
@@ -403,10 +400,11 @@ Dense(1)
 
 \begin{lrbox}{\codebox} % Start saving into \codebox lstm1
 \begin{lstlisting}[numbers=none, basicstyle=\tiny, numbersep=0pt, xleftmargin=0pt, xrightmargin=0pt, backgroundcolor=\color{white}]
-Bidirectional(LSTM(256, return_sequences=True))
-Bidirectional(LSTM(256))
-Dense(256, activation='relu')
-Dropout(0.4)
+Bidirectional(LSTM(units = 50,
+  	return_sequences=True,activation="relu")),
+Bidirectional(LSTM(units = 50,
+ 		  return_sequences=False,activation="relu")),
+Dropout(0.4),
 Dense(1)
 \end{lstlisting}
 \end{lrbox} % Stop saving into \codebox
@@ -422,7 +420,7 @@ Another code snippet here
   \hline
   \textbf{Type} & \textbf{Model} & \textbf{Epochs} & \textbf{Loss} & \textbf{MAE} \\
   \hline
-  LSTM 1& \usebox{\codebox} & 150 & 0.25 & 0.45 \\
+  LSTM 1& \usebox{\codebox} & 150 & 0.8 & 1.25 \\
   \hline
   LSTM 2& \usebox{\codeboxtwo} & x & x & x \\
   \hline

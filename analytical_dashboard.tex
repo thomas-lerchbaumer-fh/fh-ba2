@@ -38,25 +38,29 @@ This design comes along with several advantages. The logic for analytical reques
 
 For geographical grouping the following logic is applied:
 \begin{lstlisting}
-radius = 20 # in km
-res = collections.defaultdict(list)
-ignore_list = set()
-for point_a in data:
-   if point_a['id'] in ignore_list:  # Skip if point_b['id'] is in ignore_list
-      continue
-   tmp_point_a_dep = tuple((point_a['taskFrom_lng'], point_a['taskFrom_lat']))
-   tmp_point_a_dest = tuple((point_a['taskTo_lng'], point_a['taskTo_lat']))
-   for point_b in data:
-	   tmp_point_b_dep = tuple((point_b['taskFrom_lng'], point_b['taskFrom_lat']))
-       tmp_point_b_dest = tuple((point_b['taskTo_lng'], point_b['taskTo_lat']))
-       actual_distance_dep = distance.great_circle(tmp_point_a_dep, tmp_point_b_dep).km
-       actual_distance_dest = distance.great_circle(tmp_point_a_dest, tmp_point_b_dest).km
-       if actual_distance_dep < radius and actual_distance_dest < radius:
-          key = point_a['id']
-          res[key].append(point_b)
-          ignore_list.add(point_b['id'])  # Add point_b['id'] to ignore_list
+radius = 20
+    res = collections.defaultdict(list)
+    tmp_list = collections.defaultdict(list)
+    for point_a in data:
+        tmp_point_a_dep = tuple((point_a['taskFrom_lng'], point_a['taskFrom_lat']))
+        tmp_point_a_dest = tuple((point_a['taskTo_lng'], point_a['taskTo_lat']))
+        key = point_a['id']
+        found = False
+        for key_b in res:
+            point_b = res[key_b][0]
+
+            tmp_point_b_dep = tuple((point_b['taskFrom_lng'], point_b['taskFrom_lat']))
+            tmp_point_b_dest = tuple((point_b['taskTo_lng'], point_b['taskTo_lat']))
+            actual_distance_dep = distance.great_circle(tmp_point_a_dep, tmp_point_b_dep).km
+            actual_distance_dest = distance.great_circle(tmp_point_a_dest, tmp_point_b_dest).km
+            if actual_distance_dep < radius and actual_distance_dest < radius:
+                res[key_b].append(point_a)
+                found = True
+                break
+        if not found:
+            res[key].append(point_a)
 \end{lstlisting}
-This logic performs the comparison between two geographical entries. Whenever \verb|point\_b| is within a 20km radius of the departure and destination area from \verb|point\_a| \verb|point\_b| is added to the group from \verb|point\_a|. Utilizing this design makes it possible to still include filters like date ranges to filter groupings by date. Additional a trip is added to an ignore list to avoid micro groupings as some points might added to multiple groups. Furthermore the averages for attributes explained in section \ref{sec:averages} can be utilized and compared to evaluate certain trends. By adjusting the logic above and removing the constraint that both destination and departure has to be within a certain range this data can further be grouped into popular destination places as well as popular departure places. Depending on the grouping technique various insights can be gathered. By analysing grouped data that mark routes (same departure/destination radius) the pricing strategy for routes with high demand can be adapted. Whereas analysing the grouping on departure places with high traffic bus operators might consider to expand their maximum approaching distance. Furthermore by changing the way how the data is fetched from the database by querying results where no bus was offered \verb|amountSearchResults == 0| a different grouping becomes available for analysing. 
+This logic performs the comparison between two geographical entries. Whenever \verb|point\_b| is within a 20km radius of the departure and destination area from \verb|point\_a| \verb|point\_b| is added to the group from \verb|point\_a|. Utilizing the demonstrated database design makes it possible to still include filters like date ranges to filter groupings by date. Furthermore the averages for attributes explained in section \ref{sec:averages} can be utilized and compared to evaluate certain trends. By adjusting the logic above and removing the constraint that both destination and departure has to be within a certain range this data can further be grouped into popular destination places as well as popular departure places. Depending on the grouping technique various insights can be gathered. By analysing grouped data that mark routes (same departure/destination radius) the pricing strategy for routes with high demand can be adapted. Whereas analysing the grouping on departure places with high traffic bus operators might consider to expand their maximum approaching distance. Furthermore by changing the way how the data is fetched from the database by querying results where no bus was offered \verb|amountSearchResults == 0| a different grouping becomes available for analysing. 
 \subsubsection{Visualization}
 Depending on how the entries are grouped different Visualization techniques are applied. To detect departure areas with high demand a heatmap is utilized. Therefore a interactive map is utilized. Onto this map areas with high demand are plotted following a color scheme. Red circles indicate high demand whereas blue areas indicate areas with less demand as shown in figure \ref{fig:heatmap_dep}. Furthermore this visualization can be filtered by applying date ranges. Additionally areas with high demand are displayed in a table including total count of requests for a certain area, average pax as well as the average travel distance.
 \newline
@@ -111,12 +115,12 @@ The grouping by day is visualized by an heatmap mapped to an calendar. By invest
 	\centering
 		\includegraphics[width=15cm]{images/grouping_by_taskFrom}
 	\caption{Daily grouping of Departure Dates- [source:[author]]}
-	\label{fig:hourly_grouping}
+	\label{fig:grouping_dep_daily}
 \end{figure}
 
 \begin{figure}[H]
 	\centering
 		\includegraphics[width=15cm]{images/grouping_by_created_at}
 	\caption{Daily grouping of when search requests are made- [source:[author]]}
-	\label{fig:hourly_grouping}
+	\label{fig:grouping_search_daily}
 \end{figure}
