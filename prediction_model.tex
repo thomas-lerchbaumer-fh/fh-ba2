@@ -369,18 +369,18 @@ Dense(1)
 
 \begin{lrbox}{\codeboxfive} % Start saving into \codebox lstm1
 \begin{lstlisting}[numbers=none, basicstyle=\tiny, numbersep=0pt, xleftmargin=0pt, xrightmargin=0pt, backgroundcolor=\color{white}]
-    Conv1D(filters=64, kernel_size=10, strides=1,
-           padding='causal', activation='relu'),
-    Dropout(0.2),
-    Conv1D(filters=64, kernel_size=10, strides=1,
-           padding='causal', activation='relu'),
-    Dropout(0.2),
-    Conv1D(filters=32, kernel_size=10, strides=1,
-           padding='causal', activation='relu'),
-    GlobalAveragePooling1D(),
-    Flatten(),
-    Dropout(0.1),
-    Dense(1)
+Conv1D(filters=64, kernel_size=10, strides=1,
+    padding='causal', activation='relu'),
+Dropout(0.2),
+Conv1D(filters=64, kernel_size=10, strides=1,
+    padding='causal', activation='relu'),
+Dropout(0.2),
+Conv1D(filters=32, kernel_size=10, strides=1,
+    padding='causal', activation='relu'),
+GlobalAveragePooling1D(),
+Flatten(),
+Dropout(0.1),
+Dense(1)
 \end{lstlisting}
 \end{lrbox} % Stop saving into \codebox
 
@@ -400,18 +400,34 @@ Dense(1)
 
 \begin{lrbox}{\codebox} % Start saving into \codebox lstm1
 \begin{lstlisting}[numbers=none, basicstyle=\tiny, numbersep=0pt, xleftmargin=0pt, xrightmargin=0pt, backgroundcolor=\color{white}]
-Bidirectional(LSTM(units = 50,
-  	return_sequences=True,activation="relu")),
-Bidirectional(LSTM(units = 50,
- 		  return_sequences=False,activation="relu")),
-Dropout(0.4),
+Bidirectional(LSTM(units = 80,
+ 	return_sequences=False,activation="relu")),
+Dropout(0.2),
 Dense(1)
 \end{lstlisting}
 \end{lrbox} % Stop saving into \codebox
 
+
 \begin{lrbox}{\codeboxtwo} % Start saving into \codeboxtwo lstm2
 \begin{lstlisting}[numbers=none, basicstyle=\tiny, numbersep=0pt, xleftmargin=0pt, xrightmargin=0pt, backgroundcolor=\color{white}]
-Another code snippet here
+Bidirectional(LSTM(units = 100,
+	return_sequences=True,activation="relu")),
+Bidirectional(LSTM(units = 80,
+	return_sequences=False,activation="relu")),
+Dropout(0.2),
+Dense(1)
+\end{lstlisting}
+\end{lrbox} % Stop saving into \codeboxtwo
+
+\begin{lrbox}{\codeboxthree} % Start saving into \codeboxtwo lstm2
+\begin{lstlisting}[numbers=none, basicstyle=\tiny, numbersep=0pt, xleftmargin=0pt, xrightmargin=0pt, backgroundcolor=\color{white}]
+Bidirectional(LSTM(units = 120, 
+	return_sequences=True,activation="relu")),
+Dropout(0.3),
+Bidirectional(LSTM(units = 120, 
+	return_sequences=False,activation="relu")),
+Dropout(0.2),
+Dense(1))
 \end{lstlisting}
 \end{lrbox} % Stop saving into \codeboxtwo
 
@@ -420,9 +436,9 @@ Another code snippet here
   \hline
   \textbf{Type} & \textbf{Model} & \textbf{Epochs} & \textbf{Loss} & \textbf{MAE} \\
   \hline
-  LSTM 1& \usebox{\codebox} & 150 & 0.8 & 1.25 \\
+  LSTM 1& \usebox{\codebox} & 150 & 0.74 & 1.11 \\
   \hline
-  LSTM 2& \usebox{\codeboxtwo} & x & x & x \\
+  LSTM 2& \usebox{\codeboxtwo} & 250 & 0.25 & 0.55 \\
   \hline
   LSTM 3& \usebox{\codeboxtwo} & x & x & x \\
   \hline
@@ -448,13 +464,21 @@ Looking at the structure of a date like 2023-01-01 additional features become vi
 \newline
 In order to extract additional features the following code is applied: 
 \begin{lstlisting}
-***********PLACEHOLDER*************************
 df['month'] = df.index.month
 df['day'] = df.index.day
 df['dayofweek'] = df.index.dayofweek
 df['quarter'] = df.index.quarter
+df['year'] = df.index.year
+df["isweekend"] = np.where(df.index.day_name().isin(['Saturday', 'Sunday']), 1, 0)
+df['week_of_year'] = df.index.isocalendar().week
+austrian_holidays = Austria(years=list(range(2017, 2024)))
+df['is_holiday'] = df.index.map(lambda x: int(x in austrian_holidays))
+df['bookings_roll_mean7'] = df['bookings'].rolling(window=7).mean()
+df["main_season"] = np.where(df["month"].isin([5, 6, 7, 8, 9]), 1, 0)
+df["off_season"] = np.where(df["month"].isin([5, 6, 7, 8, 9]), 0, 1)
+df["ut"] = (df["bookings"] > high_ut).astype(float)
 \end{lstlisting}
-The initial dataframe (df) remains untouched and got the same structure as in section \ref{sec:implementation}. As the index of the \verb|df| is initialized as \verb|pd.to_datetime()| operations like \verb|index.month|, \verb|index.day| etc. become available. Those functions extract the values based on each index available of within the df. 
+The initial dataframe remains untouched and got the same structure as in section \ref{sec:implementation}. As the index of the \verb|df| is initialized as \verb|pd.to_datetime()| operations like \verb|index.month|, \verb|index.day| etc. become available. Those functions extract the values based on each index available of within the df. 
 For the initial training of the multivariant LSTM model the following architecture and parameters are used. 
 \begin{lstlisting}
 ***********PLACEHOLDER*************************
