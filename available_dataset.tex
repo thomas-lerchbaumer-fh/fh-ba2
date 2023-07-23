@@ -79,12 +79,24 @@ The logic above compares all entries based on the attributes mentioned above rem
 
 To validate and norm the available data present in both tables no actions are required due to fact that attributes that do not meet their defined data types are not stored in first place. 
 
+
+\section{Overfitting and Underfitting}
+One problem that can occur when utilizing NN for predictions is over-fitting or under-fitting of the training data. Both scenarios result in a poor performance of the trained model.
+\subsection{Overfitting}
+
+Overfitting describes the phenomenon that the model is not able to improve its problem solving capabilities after a certain period of training. There are multiple reasons for the occurrence of overfitting. One reason for example is a inaccurate or unbalanced training set. This leads to the fact that the NN produces wrong connections during its training.  Whereas the results for the training set are accurate the problems  occur during the validation phase because the model learned wrong characteristics. \cite{fitting} 
+\subsection{Underfitting}
+On the other hand underfitting arises when the model is not capable of identifying the traits of the training set and therefore struggles to achieve matching its target values. This results in a high loss values. Reasons for underfitting are caused by a lack of trainable parameters as well as a NN model with a simple architecture in terms of hidden layers.
+
+
+As the data was affected during the Covid19 pandemic data augmentation is necessary in order to avoid both scenarios.
+
 \section{Data Augmentation}
 \label{sec:data_aug}
-Starting from March 2020 countries like Austria, Germany, Switzerland and Lichtenstein had to put travel restrictions into effect due to the ongoing Covid19 pandemic \\citeHere. This travel restrictions impacted the gathered booking data as those restrictions forbid travelling.
+Starting from March 2020 countries like Austria, Germany, Switzerland and Lichtenstein had to put travel restrictions into effect due to the ongoing Covid19 pandemic. These travel restrictions impacted the gathered booking data as those restrictions forbid travelling.
 \begin{figure}[H]
 	\centering
-		\includegraphics[width=14cm]{images/no_augmentation}
+		\includegraphics[width=11cm]{images/no_augmentation}
 	\caption{Bookings over time - [source:author]}
 	\label{fig:noAug}
 \end{figure}
@@ -112,7 +124,7 @@ for date in substitute_corona:
 The average growth per anno is around 30\%. After applying the logic the data set looks the following:  
 \begin{figure}[H]
 	\centering
-		\includegraphics[width=14cm]{images/with_augmentation}
+		\includegraphics[width=11cm]{images/with_augmentation}
 	\caption{Augmented Data Set - [source:author]}
 	\label{fig:augmented_data}
 \end{figure}

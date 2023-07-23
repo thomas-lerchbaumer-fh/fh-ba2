@@ -142,15 +142,6 @@ The activation function is also part of the fully connected layer. This layer ap
 
 The flatten layer transforms two dimensional input data into one dimensional input vectors. It's output is used to provide outputs to the fully connected layer. Over-fitting can be caused whenever all features are used in the flatten layer therefore a dropout layer can be set in place. This layer cancels out neurons during the training process of a NN which reduces the model's size. 
 
-\section{Overfitting and Underfitting}
-One problem that can occur when utilizing NN for predictions is over-fitting or under-fitting of the training data. Both scenarios result in a poor performance of the trained model.
-\subsection{Overfitting}
-
-Overfitting describes the phenomenon that the model is not able to improve its problem solving capabilities after a certain period of training. There are multiple reasons for the occurrence of overfitting. One reason for example is a inaccurate or unbalanced training set. This leads to the fact that the NN produces wrong connections during its training.  Whereas the results for the training set are accurate the problems  occur during the validation phase because the model learned wrong characteristics. \cite{fitting} 
-\subsection{Underfitting}
-On the other hand underfitting arises when the model is not capable of identifying the traits of the training set and therefore struggles to achieve matching its target values. This results in a high loss values. Reasons for underfitting are caused by a lack of trainable parameters as well as a NN model with a simple architecture in terms of hidden layers.
-\\\newline In section \ref{sec:data_cleansing} and \ref{sec:data_aug} actions were taken to avoid both overfitting and underfitting. 
-
 \section{Loss Function}
 \label{sec:loss_func}
 The loss function is one crucial element as they evaluate the accuracy of the produced outputs from a NN. This is achieved by calculating the difference between the predicted value and the actual value provided by the test dataset. Supervised learning deals with two different problems which is either a classification problem i.e. is the animal on the picture a cat or with regression problems which deal with i.e. predicting future bookings. Both of those problems use different loss function.\cite{loss_func} As this section focuses on solving a regression problem a brief overview about available loss functions and their characteristics are given. 
@@ -190,7 +181,7 @@ Both models follow the same workflow when it comes to their implementation. The 
 
 \begin{figure}[H]
 	\centering
-		\includegraphics[width=8cm]{images/workflow_imp}
+		\includegraphics[width=12cm]{images/workflow_imp}
 	\caption{Workflow of the implementation - [source:[author]]}
 	\label{fig:workflow}
 \end{figure}
@@ -453,14 +444,20 @@ Dense(1))
 	\label{tab:models}
 \end{table}
 
-By observing the results from table \ref{tab:models} it is clear to see that by increasing the epochs for approaches using CNN the actual loss as well as the MAE decreased. Never the less as illustrated in figure the model still was not able to catch up the characteristics of the training set. Regarding the LSTM model utilizing 220 epochs the lowest values for loss and MAE where achieved. Neither increasing nor decreasing the models complexities in terms of its architecture supported the model to further improve its accuracy for predictions based on the test set. 
-This behaviour indicates that only one feature might be insufficient for the models to find patterns that increase their ability to predict demand for buses for a certain day. 
-Therefore section \ref{sec:feature_eng} investigates which potential features can be extracted from the current dataset as well as their impact on prediction accuracy. 
+By observing the results from table \ref{tab:models} it is clear to see that by increasing the epochs for approaches using CNN the actual loss as well as the MAE decreased. Never the less as illustrated in figure \ref{fig:combined_model} both models (CNN 3 and LSTM 3) still were not able to catch up the characteristics of the training set. Whereas some predictions are on point the majority of predictions are shifted. Neither increasing nor decreasing the models complexities in terms of its architecture supported the model to further improve its accuracy for predictions based on the test set.
+This behaviour indicates that only one feature might be insufficient for the models to find patterns that increase their ability to predict demand for buses on a certain day.
+Therefore section \ref{sec:feature_eng} investigates which potential features can be extracted from the current dataset as well as their impact on prediction accuracy. Although none of the trained models achieve adequate results models that used LSTM achieved better results throughout the whole process. Therefore only LSTM models are utilized during section \ref{sec:feature_eng}.
+\begin{figure}[H]
+	\centering
+		\includegraphics[width=14cm]{images/combined_prediction}
+	\caption{Predictions of CNN 3 and LSTM 3 - [source:author]}
+	\label{fig:combined_model}
+\end{figure}
 
 \subsection{Feature Engineering}
 \label{sec:feature_eng}
-Feature Engineering (FE) is used to create new input values also called features that are used to enhance the capability of learning. \cite{feature_eng_2} The approaches before used the whole timestamp \verb|tasTime_from| resulting that only one feature is available to train the models.  
-Looking at the structure of a date like 2023-01-01 additional features become visible  that are usable to train out models.  The structure essentially hosts aspects like \verb|day of the month|, \verb|month|,\verb|year|, \verb|quarter of the year| as well as \verb|week of the year|. By extracting those characteristics form every single date more features become available that can be utilized to train the model. As there are certain seasonal patterns that can be observed when looking at the booking data those features provide additional context that can be utilized by the model during training to improve its ability to detect certain patterns. As the LSTM model in general looks like the more suitable candidate due to the past results it provided during section \ref{sec:implementation} and \ref{sec:hyper} the approach of feature engineering is only applied onto the LSTM approach.
+Feature Engineering (FE) is used to create new input values also called features. Those values are further used to enhance a models learning capability. \cite{feature_eng_2} The approaches before used the whole timestamp \verb|tasTime_from| resulting that only one feature is available to train the models.  
+Looking at the structure of a date like 2023-01-01 additional features become visible. Those values can be extracen and used to train the model.  The structure essentially hosts aspects like \verb|day of the month|, \verb|month|,\verb|year|, \verb|quarter of the year| as well as \verb|week of the year|. Furthermore this approach provides the possibility to provide additional context to the model like holidays. The insights gathered during chapter \ref{chap:insights} furthermore revealed the seasonal patterns. By extracting those characteristics form every single date more features become available train the model. As the LSTM model in general looks like the more suitable candidate due to the past results it provided during section \ref{sec:implementation} and \ref{sec:hyper} the approach of feature engineering is only applied onto the LSTM approach.
 \newline
 In order to extract additional features the following code is applied: 
 \begin{lstlisting}
@@ -469,16 +466,15 @@ df['day'] = df.index.day
 df['dayofweek'] = df.index.dayofweek
 df['quarter'] = df.index.quarter
 df['year'] = df.index.year
-df["isweekend"] = np.where(df.index.day_name().isin(['Saturday', 'Sunday']), 1, 0)
+df["weekend"] = np.where(df.index.day_name().isin(['Saturday', 'Sunday']), 1, 0)
 df['week_of_year'] = df.index.isocalendar().week
 austrian_holidays = Austria(years=list(range(2017, 2024)))
-df['is_holiday'] = df.index.map(lambda x: int(x in austrian_holidays))
-df['bookings_roll_mean7'] = df['bookings'].rolling(window=7).mean()
+df['holiday'] = df.index.map(lambda x: int(x in austrian_holidays))
 df["main_season"] = np.where(df["month"].isin([5, 6, 7, 8, 9]), 1, 0)
 df["off_season"] = np.where(df["month"].isin([5, 6, 7, 8, 9]), 0, 1)
 df["ut"] = (df["bookings"] > high_ut).astype(float)
 \end{lstlisting}
-The initial dataframe remains untouched and got the same structure as in section \ref{sec:implementation}. As the index of the \verb|df| is initialized as \verb|pd.to_datetime()| operations like \verb|index.month|, \verb|index.day| etc. become available. Those functions extract the values based on each index available of within the df. 
+The initial dataframe (DF) remains untouched and got the same structure as in section \ref{sec:implementation}. As the index of the \verb|df| is initialized as \verb|pd.to_datetime()| operations like \verb|index.month|, \verb|index.day| etc. become available. Those functions extract the values based on each index available  within the DF. 
 For the initial training of the multivariant LSTM model the following architecture and parameters are used. 
 \begin{lstlisting}
 ***********PLACEHOLDER*************************
@@ -522,5 +518,7 @@ Looking at the results in figure \ref{fig:lstm_multi_1_prediction} the enhanced 
 
 \section{Predictions And Yield Management}
 \label{sec:pred_and_ym}
-To determine weather or not the model can be utilized to support the YM knowledge about how far in advanced buses are booked is crucial. By computing the median timespan utilizing the attributes \verb|createdAt| and \verb|tasTime_from| this information can be gathered from the available dataset. The median timespan between \verb|createdAt| and \verb|taskFrom_time| is around 38 days. As the model is able to provide adequate results for at least 5 months into the future the model is suitable for the purpose of supporting the YM.  Those predictions in addition to bookings already made for a certain date can be used  to adapt the pricing strategy.
+To determine weather or not the model can be utilized to support the YM knowledge about how far in advanced buses are booked is crucial. By computing the median timespan utilizing the attributes \verb|createdAt| and \verb|tasTime_from| this information can be gathered from the available dataset. The median timespan between \verb|createdAt| and \verb|taskFrom_time| is around 38 days. Throughout the whole implementation process which included the training of various model architectures as well as singlevariate and multivariate models, models utilizing LSTM achieved the best results. 
+
+As the model is able to provide adequate results for at least 5 months into the future the model is suitable for the purpose of supporting the YM.  Those predictions in addition to bookings already made for a certain date can be used  to adapt the pricing strategy.
 The model can be a powerful tool utilized for YM but certain security mechanisms need to be set in place. Furthermore the model requires continuous training on new data that becomes available otherwise the accuracy on long-term predictions might decrease. 

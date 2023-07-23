@@ -19,13 +19,11 @@ This section focuses on the implementation of various groupings as well as their
 As those implementations will contribute to an analytical dashboard the visualization of the prepared data are implemented using React. For each grouping a separate React component is created. Communication between the front- and backend is accomplished using a Rest interface. 
 
 \begin{itemize}
-\item  \verb|React|\footnote{https://react.dev/} - used to Visualize
-\item \verb|Python|\footnote{https://www.python.org/} - used to implement the grouping logic
+\item  \verb|React|\footnote{https://react.dev/} - used for visualization
+\item \verb|Python|\footnote{https://www.python.org/} - used to implement the grouping logic and interaction with the database
 \item \verb|fastapi|\footnote{https://fastapi.tiangolo.com/} - Rest interface (Connection between Backend and Frontend) 
 \item \verb|geopy|\footnote{https://geopy.readthedocs.io/en/stable/} - Used for calculations on latitude and longitude 
 \end{itemize}
-
-
 \section{Grouping Implementation}
 
 \subsection{Grouping by Geographical Attributes}
