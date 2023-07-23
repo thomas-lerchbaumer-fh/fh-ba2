@@ -12,7 +12,7 @@
 
 \chapter{Implementation of Averages and Grouping}
 \label{chap:analytical_dashboard}
-This section focuses on the implementation of various groupings as well as their visualization. As the analytical dashboard is web based a short overview about its technical setup is given in section \ref{sec:tech_set}.
+Since this paper aims to extract metrics that can contribute to an analytical dashboard this section focuses on the implementation of various groupings as well as their visualization. As the analytical dashboard is web based a short overview about its technical setup is given in section \ref{sec:tech_set}.
 
 \section{Technical Setup}
 \label{sec:tech_set}
@@ -27,7 +27,7 @@ As those implementations will contribute to an analytical dashboard the visualiz
 \section{Grouping Implementation}
 
 \subsection{Grouping by Geographical Attributes}
-The dataset for bus search requests (after cleaning) currently got around 230.000 entries. As the geographical calculations as well as the grouping logic are computational expensive tasks it is not feasible to redo this logic on every request. To enable real time requests with various filters onto the grouped data an additional database table. The table consists of two attributes: 
+The dataset for bus search requests (after cleaning) currently has around 230.000 entries. As the geographical calculations as well as the grouping logic are computational expensive tasks it is not feasible to redo this logic on every request. To enable real time requests with various filters onto the grouped data an additional database table is introduced. The table consists of two attributes: 
 \begin{itemize}
 \item \verb|parent_id (FK - search_requests(task_id)| - parent that defines a region 
 \item \verb|child_id (FK - search_requests(task_id)| - entries that belong to a certain parent region  
@@ -103,22 +103,23 @@ The hourly groupings are visualized using a line chart as demonstrated in figure
 \begin{figure}[H]
 	\centering
 		\includegraphics[width=15cm]{images/requests_hour}
-	\caption{Requests grouped on hourly basis- [source:[author]]}
+	\caption{***PLACEHOLDER Requests grouped on hourly basis- [source:[author]]}
 	\label{fig:hourly_grouping}
 \end{figure}
 By analysing figure \ref{fig:hourly_grouping} the highest the most search requests are made at around 9am. By hovering over each data point the amount of search requests become visible. 
 \newline
-The grouping by day is visualized by an heatmap mapped to an calendar. By investigating the results for different years a pattern become visible. Most of the requests are made starting from May until July. 
+ 
 \begin{figure}[H]
 	\centering
 		\includegraphics[width=15cm]{images/grouping_by_taskFrom}
-	\caption{Daily grouping of Departure Dates- [source:[author]]}
+	\caption{ **PLACEHOLDER Daily grouping of Departure Dates- [source:[author]]}
 	\label{fig:grouping_dep_daily}
 \end{figure}
-
+The grouping by day is visualized by an heatmap mapped to an calendar. By investigating the results for different years seasonal patterns become visible.
 \begin{figure}[H]
 	\centering
 		\includegraphics[width=15cm]{images/grouping_by_created_at}
-	\caption{Daily grouping of when search requests are made- [source:[author]]}
+	\caption{**PLACEHOLDER Daily grouping of when search requests are made- [source:[author]]}
 	\label{fig:grouping_search_daily}
 \end{figure}
+All of the extracted groupings are filterable by date ranges in real time. Furthermore whenever a filter is applied the average pax as well as the average distance is provided to the user.
