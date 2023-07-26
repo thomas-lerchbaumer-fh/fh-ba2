@@ -12,20 +12,20 @@
 
 \chapter{Available Dataset}
 \label{chap:available_dataset}
-Busfinder is a bus booking service that allows customers to search and book individual bus trips in real time. The company is facing the problem that a large variety of data is available but as by now nobody investigate it's potential. The company is looking for a way to gain insights from the already collected data. As there is no current infrastructure to analyse data in place and universal solutions are not available this thesis analysis the available data and proposes metrics that can be utilized to improve the offered service. Furthermore the used to carry out the experiment shown in chapter \ref{chap:predict}. To do so chapter focuses on explaining the available dataset and it's attributes. Furthermore the data is prepared for the purpose of statistical analysis as well as for it's utilization for ML models. Furthermore the avail
+Busfinder is a bus booking service that allows customers to search and book individual bus trips in real time. The company is facing the problem that a large variety of data is available but as by now nobody investigated its potential. The company is looking for a way to gain insights from the already collected data. As there is no current infrastructure in place to analyse data and universal solutions are not available this thesis analyses the available data and proposes metrics that can be utilised to improve the offered service. Moreover the available data is utilised to train the ML models used for the experiment in chapter \ref{chap:predict}. This chapter focuses on explaining the available dataset and its attributes. Furthermore the data is prepared for the purpose of statistical analysis as well as for its utilisation for ML models.
 
 \section{Data Origin}
 The available dataset is gathered from busfinder which provides a service to find and book buses for individual journeys. This service is currently available in Austria, Germany, Switzerland and Liechtenstein. The buses itself are offered in real time by various different bus companies. Offers can vary in price which is based on individual bus calculations schemes. Those schemes vary from operator to operator. The data is stored in a relational database. Since the service also provides the possibility to directly book a bus, booking and corresponding user meta data is available as well. \newline
 
 \section{Data Structure}
-The service launched in March 2017 therefore booking data is available back to this date. Tracking the search requests was introduced in October 2020. 
-The request table itself keeps track of 40 attributes but not all of them host valuable information that could be analysed therefore only the ones which can be analysed are listed and explained below:
+The busfinder launched in March 2017. Therefore booking data is available back to this date. Tracking the search requests was introduced in October 2020. 
+The request table itself keeps track of 40 attributes but not all of them host valuable information that could be analysed. Hence only the ones which can be analysed are listed and explained below:
 
 \begin{itemize}
   \item \verb|task_id| - PK (incremented value) 
-  \item \verb|createdAt| - At which time the search request was made.
+  \item \verb|createdAt| - At which time the search request was made
   \item \verb|accountId| - Not empty when the user is currently logged in
-   \item \verb|ipHash| - Hashed value of the customers IP address
+   \item \verb|ipHash| - Hashed value of the customer's IP address
   \item \verb|amountSearchResults| - How many buses can be offered
   \item \verb|containsTripCompany| - If the user wants to stop at a certain company during the trip
   \item \verb|distanceInMeters|  - Distance between departure and destination place
@@ -46,19 +46,19 @@ The request table itself keeps track of 40 attributes but not all of them host v
 Whenever a booking is made the correlating data is stored within a booking table. As the booking table contains sensitive data which is not scope of the analysis, only four attributes are used: 
 
 \begin{itemize}
-	\item \verb|createdAt| - At which time the booking was made.
+	\item \verb|createdAt| - At which time the booking was made
 	\item \verb|company_id| - FK used to identify who received the booking
-	\item \verb|task_id| - FK used to link the booking to an search request 
+	\item \verb|task_id| - FK used to link the booking to a search request 
 	\item \verb|taskTime_from| - Indicates the day of departure
 	\item \verb|basePrice_amount| - The price the customer has to pay
 \end{itemize} 
 
 \section{Data Cleansing}
 \label{sec:data_cleansing}
-During this process the available data is investigated for irregularities that cause distortion when applying statistical models. 
+During the data cleansing process the available data is investigated for irregularities that cause distortion when applying statistical models. 
 
 Search requests are tracked whenever a user opens the service and searches for a certain connection. Given that behaviour it may occur that a user searches for the same connection within a short time window. This behaviour results in the need of de-duplication to avoid bias. To filter out duplicates the attributes \verb|ipHash|, \verb|createdAt|, \verb|taskFrom_address| and \verb|taskTo_address| are used to identify requests from the same user within a certain timespan. A search request is considered as non duplicate whenever the timespan between equal entries is larger than one hour. 
-To pre-process the data the following logic is applied once.
+To pre-process the data the following logic is applied once:
 \begin{lstlisting}
     query = '''
     DELETE t1
@@ -81,13 +81,14 @@ The logic above compares all entries based on the attributes mentioned above and
 To validate and norm the available data present in both tables no actions are required due to fact that attributes that do not meet their defined data types are not stored in first place. 
 
 \section{Overfitting and Underfitting}
-One problem that can occur when utilizing NNs for predictions is overfitting or underfitting of the training data. Both scenarios result in a poor performance of the trained model. \cite{fitting} 
+One problem that can occur when utilising NNs for predictions is overfitting or underfitting of the training data. Both scenarios result in a poor performance of the trained model. \cite{fitting} 
 \subsection{Overfitting}
 
-Overfitting describes the phenomenon that the model is not able to improve its problem solving capabilities after a certain period of training. There are multiple reasons for the occurrence of overfitting. One reason for example is a inaccurate or unbalanced training set. This leads to the fact that the NN produces wrong connections during its training.  Whereas the results for the training set are accurate the problems  occur during the validation phase because the model learned wrong characteristics. \cite{fitting} 
+Overfitting describes the phenomenon that the model is not able to improve its problem solving capabilities after a certain period of training. There are multiple reasons for the occurrence of overfitting. One reason for example is an inaccurate or unbalanced training set. This leads to the fact that the NN produces wrong connections during its training.  Whereas the results for the training set are accurate the problems  occur during the validation phase because the model learned wrong characteristics. \cite{fitting} 
 \subsection{Underfitting}
-On the other hand underfitting arises when the model is not capable of identifying the traits of the training set and therefore struggles to achieve matching its target values. This results in a high loss values. Reasons for underfitting are caused by a lack of trainable parameters as well as a NN model with a simple architecture in terms of hidden layers. \cite{fitting} 
-
+On the other hand underfitting arises when the model is not capable of identifying the traits of the training set and therefore struggles to achieve matching its target values. This results in high loss values. Reasons for underfitting are caused by a lack of trainable parameters as well as a NN model with a simple architecture in terms of hidden layers. \cite{fitting} 
+\newline
+\newline
 As the data was affected during the Covid19 pandemic data augmentation is necessary in order to avoid both scenarios.
 
 \section{Data Augmentation}
@@ -99,7 +100,7 @@ Starting from March 2020 countries like Austria, Germany, Switzerland and Liecht
 	\caption{Bookings over time - [source:author]}
 	\label{fig:noAug}
 \end{figure}
-Figure \ref{fig:noAug} highlights the drop of bookings starting from March 2020 until June 2022. The extreme spikes which can be observed during summer 2022 are related to two events taking place in Spielberg in Austria. Both the Formula 1 as well as MotoGP utilized the service to organise the bus shuttles. All buses that were operating as shuttles were booked via busfinder.  To achieve reliable results when utilizing this data for a time series forecasting ML model this time period needs augmentation. When analysing the chart \ref{fig:noAug} an continuous growth of bookings is visible until 2021. One way to augment the data \cite{data_aug} is calculate the average growth during this time span. To substitute the distorted data the current data is replaced by the value of the previous year. This value is then multiplied by the average growth. Furthermore missing timestamps throughout the whole time series are added with a value of zero. The following logic is applied to the data frame: 
+Figure \ref{fig:noAug} highlights the drop of bookings starting from March 2020 until June 2022. The extreme spikes which can be observed during summer 2022 are related to two events taking place in Spielberg in Austria. Both the Formula 1 as well as MotoGP utilised the service to organise the bus shuttles. All buses that were operating as shuttles were booked via busfinder.  To achieve reliable results when utilising this data for a time series forecasting ML model this time period needs augmentation. When analysing the figure \ref{fig:noAug} a continuous growth of bookings is visible until 2021. One way to augment the data is to calculate the average growth during this time span \cite{data_aug}. To substitute the distorted data the current data is replaced by the value of the previous year. This value is then multiplied by the average growth. Furthermore missing timestamps throughout the whole time series are added with a value of zero. The following logic is applied to the data frame: 
 
 \begin{lstlisting}
 df = db.get_booking_data()

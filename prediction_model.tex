@@ -12,8 +12,8 @@
 
 \chapter{Predicting Future Bookings}
 \label{chap:predict}
-As this paper aims to evaluate various NNs for their usage for time series forecasting this chapter explains which NNs were conducted and how they are integrated. The knowledge of potential future bookings provide useful insights when it comes to YM. YM in general describes controlling price and capacity control in a simultaneous ways \cite{yield_m}. Therefore those predictions can be used to support bus operators in their pricing strategy. This chapter focuses on creating two prediction models utilizing different techniques based on the data that is available. 
-Both models are implemented using python and the following libraries. 
+As this paper aims at evaluation various NNs regarding their usage for time series forecasting this chapter explains which NNs are suitable and how they can be integrated. The knowledge of potential future bookings provide useful insights when it comes to YM. YM in general describes controlling price and capacity control in a simultaneous ways \cite{yield_m}. Therefore those predictions can be used to support bus operators in their pricing strategy. This chapter focuses on creating two prediction models utilising different techniques based on the data that is available. 
+Both models are implemented using Python and the following libraries:
 \begin{itemize}
 \item  \verb|matplotlib|\footnote{https://matplotlib.org/} - used for plotting
 \item \verb|pandas|\footnote{https://pandas.pydata.org/} - used for data manipulation 
@@ -21,20 +21,21 @@ Both models are implemented using python and the following libraries.
 \item \verb|keras|\footnote{https://keras.io/} - Neural Network library
 \end{itemize}
 
-As there are various models available a literature review is conducted to figure out which models fit the purpose of time series forecasting. It turns out that the most promising NNs that can be utilized for time series prediction are either Convolutional Neural Networks (CNN) or Recurrent Neural Networks (RNN) especially Long Short-Term Memory (LSTM)\cite{nn_1}\cite{nn_2}\cite{lstm_1}\cite{lstm_2}.
+As there are various models available a literature review is conducted to figure out which models fit the purpose of time series forecasting. It turns out that the most promising NNs that can be utilised for time series prediction are either Convolutional Neural Networks (CNN) or Recurrent Neural Networks (RNN) especially Long Short-Term Memory (LSTM)\cite{nn_1}\cite{nn_2}\cite{lstm_1}\cite{lstm_2} \citep{rnn_time_series_predict}.
 
 \section{Backpropagation}
+\label{sec:bp}
 
-As both of the models LSTM and CNN use back propagation (BP) for its training the basic concepts of the algorithm are explained in this section. To understand the logic of backpropagation a few terms need a detailed explanation: 
+As both of the models LSTM and CNN use Backpropagation (BP) for its training the basic concepts of the algorithm are explained in this section. To understand the logic of BP a few terms need a detailed explanation: 
 \subsubsection{Gradient}
-The gardient also called gradient descent is an algorithm that is used to optimize the loss function within backpropagation. That means that the gradient descent indicates by how much the weights and biases need to be adjusted in order to reduce the actual error value which is the result of the applied loss function. \cite{bp_basic}
+The gradient also called gradient descent is an algorithm that is used to optimise the loss function within BP. That means that the gradient descent indicates by how much the weights and biases need to be adjusted in order to reduce the actual error value which is the result of the applied loss function. \cite{bp_basic}
 \subsubsection{Bias}
 The bias is an additional parameter used in each neuron of a NN. It is used to directly influence the activation function to offset the results either to the negative or positive direction. When looking at the sigmoid function without any bias in place where \verb|x| correlates to the input value and \verb|w| indicates the used weight: 
 \begin{equation}
  \sigma(x) = \frac{1} {1 + e^{-{(w*x)}}}
 \label{eq:eq_4}
 \end{equation}
-When looking at figure \ref{fig:sig_wo_bias} the weights only influence the steepness of the function but won't shift it along the x axes.
+When looking at figure \ref{fig:sig_wo_bias} the weights only influence the steepness of the function but will not shift it along the x axes.
 \begin{figure}[H]
 	\centering
 		\includegraphics[width=8cm]{images/sigmoid_w_weights}
@@ -46,19 +47,19 @@ When looking at figure \ref{fig:sig_wo_bias} the weights only influence the stee
  \sigma(x) = \frac{1} {1 + e^{-{(w*x+b)}}}
 \label{eq:eq_4}
 \end{equation}
-By adding the bias value as constant to the sigmoid function can be shifted along the x axes as shown in \ref{fig:sig_w_bias}.
+By adding the bias value as constant to the sigmoid function can be shifted along the x axes as shown in figure \ref{fig:sig_w_bias}.
 \begin{figure}[H]
 	\centering
 		\includegraphics[width=8cm]{images/bias}
 	\caption{Sigmoid function with same weights but different bias - [source:author]}
 	\label{fig:sig_w_bias}
 \end{figure}
-The bias therefore is utilized to directly influence the result of the activation function and whether or not a certain neuron is activated or not. 
+The bias therefore is utilised to directly influence the result of the activation function and whether or not a certain neuron is activated or not. 
 \subsubsection{Activation Function}
-Activation functions introduce non-linearity characteristics to NN. This function is applied to the output of a neuron and decides weather or not a neuron is activated or not.\cite{activation}. In combination with the descent gradient this function enables the NN to learn complex patterns within a training set. Orignially the sigmoid function \cite{bp_basic} was used as activation function for NN but as of today multiple other functions like softmax, Tanh, ReLu emerged \cite{activation}.
+Activation functions introduce non-linearity characteristics to NN. This function is applied to the output of a neuron and decides whether or not a neuron is activated or not.\cite{activation} In combination with the descent gradient this function enables the NN to learn complex patterns within a training set. Originally the sigmoid function \cite{bp_basic} was used as activation function for NN but as of today multiple other functions like softmax, Tanh, ReLu emerged \cite{activation}.
 
 \subsubsection{Phases} 
- Backpropagation follows an iterative process. At the beginning there is the feed forward pass. During this phase the input data is passed through all layers. Each hidden layer applies a linear function to create certain weights those outputs then are fed to the activation function. Depending on how many hidden layers are used within the NN the output of the activation function is used as input for the next neuron. At the end the predicted outputs by the model are compared with the actual outputs of the training data. This comparison is evaluated through a loss function. At this step the actual learning process of the model starts by calculating the gradient of the loss function considering the output of the NN. After that the back pass is initiated. Along this phase the gradients of each previous layers are multiplied with a local gradient it's weights which results in a gradient in respect to the layer's inputs. After receiving all gradients  based on the network's input data, all weights and biases are updated and optimized to reduce the result of the loss function. The steps forward pass, loss calculation, back pass, and the updates of weight and biases are repeated to improve the network in an iterative way. \cite{bp_basic} Figure \ref{fig:bp} demonstrates the logic of the backpropagation algorithm. Whereas \verb|wu| represents the updated weights after each iteration.  
+ Backpropagation follows an iterative process. At the beginning there is the feed forward pass. During this phase the input data is passed through all layers. Each hidden layer applies a linear function to create certain weights those outputs then are fed to the activation function. Depending on how many hidden layers are used within the NN the output of the activation function is used as input for the next neuron. At the end the predicted outputs by the model are compared with the actual outputs of the training data. This comparison is evaluated through a loss function. At this step the actual learning process of the model starts by calculating the gradient of the loss function considering the output of the NN. After that the back pass is initiated. Along this phase the gradients of each previous layer are multiplied with a local gradient and its weights which results in a gradient in respect to the layer's input. After receiving all gradients  based on the network's input data, all weights and biases are updated and optimised to reduce the result of the loss function. The steps forward pass, loss calculation, back pass, and the updates of weights and biases are repeated to improve the network in an iterative way. \cite{bp_basic} Figure \ref{fig:bp} demonstrates the logic of the backpropagation algorithm. Whereas \verb|wu| represents the updated weights after each iteration.  
 
 \begin{figure}[H]
 	\centering
@@ -67,31 +68,31 @@ Activation functions introduce non-linearity characteristics to NN. This functio
 	\label{fig:bp}
 \end{figure}
 \section{The Models}
-Both models CNN and RNN/LSTM can be used for time series forecasting. To create accurate prediction models a basic knowledge about models functionality is required. Therefore this section explains the components of each NN as well as the approaches those models follow. 
+Both models CNN and RNN/LSTM can be used for time series forecasting. To create accurate prediction models a basic knowledge of the models functionalities are required. Therefore this section explains the components of each NN as well as the approaches those models follow. 
 
 \subsection{LSTM}
 \label{sec:lstm}
-LSTM is an RNN and was invented by \cite{lstm_inventor} in 1997. Until today this NN is widley used for time series forecasting and provides reliable results for short as well as long term predictions \cite{rnn_moharm}. LSTM have so called memory cells which are responsible to store the state of data. Whenever information arrives at a memory cell its outcome is defined by refreshing the cell state with the newly arrived information. LSTM utilizes gates to control a cells state by either including or excluding information \cite{lstm_stock}. The gates are called: 
+LSTM is a RNN and was invented by \cite{lstm_inventor} in 1997. Until today this NN is widley used for time series forecasting and provides reliable results for short as well as long term predictions \cite{rnn_moharm}. LSTM has so called memory cells which are responsible to store the state of data. Whenever information arrives at a memory cell its outcome is defined by refreshing the cell state with the newly arrived information. LSTM utilizes gates to control a cells state by either including or excluding information \cite{lstm_stock}. The gates are called: 
 \begin{itemize}
 \item input gate - data selection and storage for upcoming state
 \item forget gate - data selection and storage which will not be used for the upcoming state
 \item output gate - sets information within the state that is send to the output
 \end{itemize}
-Those gates are created by combining sigmoid functions. The results of this gates are values ranging from zero to one. A result of zero indicates the cell to not pass any infomration whereas values close to one indicates the cell to pass all information. 
-The LSTM Module or Repeating module consists of four NN layers which interact together as shown in Figure \ref{fig:lstm_rep_model}:
+Those gates are created by combining sigmoid functions. The results of these gates are values ranging from zero to one. A result of zero indicates the cell to not pass any information whereas values close to one indicate the cell to pass all information. 
+The LSTM module or Repeating module consist of four NN layers which interact together as shown in Figure \ref{fig:lstm_rep_model}:
 \begin{figure}[H]
 	\centering
 		\includegraphics[width=14cm]{images/lstm_module}
-	\caption{Repeating LSTM Module - [source:\cite{lstm_module}]}
+	\caption{Repeating LSTM module - [source:\cite{lstm_module}]}
 	\label{fig:lstm_rep_model}
 \end{figure}
-In total the repeating model has 3 gate activation functions which are named $\sigma_1$, $\sigma_2$,  $\sigma_3$ and shown in figure \ref{fig:lstm_rep_model}. Furthermore $\sigma_1$ and $\sigma_2$ act as output activation functions too. The cell state is illustrated using a blue line which starts at St-1 which indicates the previous memory block to St representing the current memory block. The amount of information that is passed is regulated by layer  $\sigma_1$ using the following function:
+In total the repeating model has three gate activation functions which are named $\sigma_1$, $\sigma_2$,  $\sigma_3$ and shown in figure \ref{fig:lstm_rep_model}. Furthermore $\sigma_1$ and $\sigma_2$ act as output activation functions too. The cell state is illustrated using a blue line which starts at St-1 and indicates the previous memory block to St representing the current memory block. The amount of information that is passed is regulated by layer  $\sigma_1$ using the following function:
 \begin{equation}
 cf_t = \sigma_1 (W_cf * [O_t-1, x_t] + b_cf)
 \cite{lstm_module}
 \label{eq:eq_1}
 \end{equation}
-Furthermore two network layers are used to store new information to the cell state. Therefore sigmoid layer $\sigma_2$ chooses the values which are updated by utilizing the following formula:
+Furthermore two network layers are used to store new information to the cell state. Therefore sigmoid layer $\sigma_2$ chooses the values which are updated by utilising the following formula:
 \begin{equation}
 l_t = \sigma_2(W_1 *[O_t-1, x_t]+ b_l)
 \cite{lstm_module}
@@ -110,14 +111,14 @@ S_t = cf_t * S_t1 + I_t * \widetilde{S}_t-1
 \label{eq:eq_4}
 \end{equation}
 
-The reason why a LSTM model is used for this purpose is that a standalone RNN is challenging to train due its characteristics. As Back propagation is used for RNN's problems like vanishing-gradient occur. The gradient in general can be understand as a computed value through all time setps which in the end used to update parameters of the RNN. The vanasihing-gratdient over time results in information decay. By implementing an LSTM module this problem can be solved. \cite{lstm_overcome_rnn_problem}
+The reason why a LSTM model is used for this purpose is that a standalone RNN is challenging to train due to its characteristics. As BP is used for RNNs, problems like vanishing-gradient can occur. The gradient in general can be understood as a computed value through all time steps which in the end used to update parameters of the RNN. The vanishing-gradient over time results in information decay. By implementing a LSTM module this problem can be solved. \cite{lstm_overcome_rnn_problem}
 
 \subsubsection{Bidirectional LSTM}
-Bidirectional LSTMs are able to look in both directions past and future. This is achieved by processing the available data into both directions. Therefore those models make use of bidirectional layers. Those layers split up the used neurons into two directions. \cite{bi_di_1} This provides more information to the network as the model is now capable if storing the forward state as well as the backward state. Resulting in potentially more accurate results \cite{bi_di_2}. 
+Bidirectional LSTMs are able to look in both directions past and future. This is achieved by processing the available data into both directions. Therefore those models make use of bidirectional layers. Those layers split up the used neurons into two directions. \cite{bi_di_1} This provides more information to the network as the model is now capable of storing the forward state as well as the backward state, resulting in potentially more accurate results \cite{bi_di_2}. 
 
 \subsection{CNN}
 \label{sec:cnn}
-CNN's follow the concept of NN consisting of multiple layers. The scope of application for this kind of network reaches from computer vision problems to time-series forecast modelling. Whereas data provided for image classification is structured in multi dimensional arrays (matrices), data used for time-series forecasting is provided via one dimensional arrays.\cite{cnn_intro} A CNN provides different types of layers . Those layer types are called pooling layer (PL), fully connected (FC), Convolution layer (CL) and flatten layer (FL). The connection of those layers are demonstrated in figure \ref{fig:cnn_struct}.
+CNNs follow the concept of NN consisting of multiple layers. The scope of application for this kind of network reaches from computer vision problems to time-series forecast modelling. Whereas data provided for image classification is structured in multi dimensional arrays (matrices), data used for time-series forecasting is provided via one dimensional arrays.\cite{cnn_intro} A CNN provides different types of layers. Those layer types are called Pooling Layer (PL), Fully Connected (FC), Convolution layer (CL) and flatten layer (FL). The connection of those layers are demonstrated in figure \ref{fig:cnn_struct}.
 \begin{figure}[H]
 	\centering
 		\includegraphics[width=10cm]{images/1d_cnn_model}
@@ -125,7 +126,7 @@ CNN's follow the concept of NN consisting of multiple layers. The scope of appli
 	\label{fig:cnn_struct}
 \end{figure}
 
-CNN is based on convolution which is a linear operation that multiplies input data with convolution filters. Those filters which are also called kernels correlate to a set of weights \cite{cnn_vechicle}. The kernel values are created during the learning process and are optimized from the NN utilizing back propagation. Furthermore this layer is utilized to detect features within the given one dimensional array. Those features are stored within a feature map and are calculated by applying convolutions on the input data. One crucial parameter to detect proper features is the size of the kernel. The kernel size can be understand as a number of weights that are multiplied with the input data. After each multiplication the sequence is shifted along the input data. Each shift during this process produces one output which is stored in the feature map. The following example demonstrates how this process is done.\cite{1d_cnn}
+CNN is based on convolution which is a linear operation that multiplies input data with convolution filters. Those filters which are also called kernels correlate to a set of weights \cite{cnn_vechicle}. The kernel values are created during the learning process and are optimised from the NN utilising BP. Furthermore this layer is utilised to detect features within the given one dimensional array. Those features are stored within a feature map and are calculated by applying convolutions on the input data. One crucial parameter to detect proper features is the size of the kernel. The kernel size can be understood as a number of weights that are multiplied with the input data. After each multiplication the sequence is shifted along the input data. Each shift during this process produces one output which is stored in the feature map. The following example demonstrates how this process is done:\cite{1d_cnn}
 \begin{lstlisting}
 Input Data: [4,7,10,43,20,10] e.g. number of bookings per day. 
 Kernel: [0.5,0.25,0.2] Kernel size = 3
@@ -134,17 +135,17 @@ Kernel: [0.5,0.25,0.2] Kernel size = 3
 ...
 Output sequence [5.75, 14.6, ...]
 \end{lstlisting}
-The second operation that is used within the CNN is called activation function. This non-linear function is utilized to detect complex relationships between variables and are applied onto the feature map. As of today multiple functions like ReLU, Sigmoid and softmax can be used as activation functions \cite{cnn_basic3}.
+The second operation that is used within the CNN is called activation function. This non-linear function is utilized to detect complex relationships between variables and are applied onto the feature map. As of today multiple functions like ReLU, sigmoid and softmax can be used as activation functions \cite{cnn_basic3}.
 
-The pooling layer as shown in figure \ref{fig:cnn_struct} is deployed within a NN to diminish the size of feature maps. To reduce the size pooling operations like average pooling, max pooling or sum pooling can be applied. Applying one of those operations results in less computational efford.\cite{cnn_basic}
+The pooling layer as shown in figure \ref{fig:cnn_struct} is deployed within a NN to diminish the size of feature maps. To reduce the size pooling operations like average pooling, max pooling or sum pooling can be applied. Applying one of those operations results in less computational effort.\cite{cnn_basic}
 
-The activation function is also part of the fully connected layer. This layer applies the activation function onto the feature map and enables the model in combination with backpropagation to learn complex connections between features. Furthermore this layer operates on the already flatten feature map and outputs a 2d vector.\cite{1d_cnn}
+%The activation function is also part of the fully connected layer. This layer applies the activation function onto the feature map and enables the model in combination with BP to learn complex connections between features. Furthermore this layer operates on the already flatten feature map and outputs a 2d vector.\cite{1d_cnn}
 
-The flatten layer transforms two dimensional input data into one dimensional input vectors. It's output is used to provide outputs to the fully connected layer. Over-fitting can be caused whenever all features are used in the flatten layer therefore a dropout layer can be set in place. This layer cancels out neurons during the training process of a NN which reduces the model's size. 
+The flatten layer transforms two dimensional input data into one dimensional input vectors. Its output is used to provide values to the fully connected layer. Overfitting can be caused whenever all features are used in the flatten layer. Therefore a dropout layer can be set in place.****CITEHERE**** This layer cancels out neurons during the training process of a NN which reduces the model's size. 
 
 \section{Loss Function}
 \label{sec:loss_func}
-The loss function is one crucial element as they evaluate the accuracy of the produced outputs from a NN. This is achieved by calculating the difference between the predicted value and the actual value provided by the test dataset. Supervised learning deals with two different problems which is either a classification problem i.e. is the animal on the picture a cat or with regression problems which deal with i.e. predicting future bookings. Both of those problems use different loss function.\cite{loss_func} As this section focuses on solving a regression problem a brief overview about available loss functions and their characteristics are given. 
+The loss function is one crucial element as it evaluates the accuracy of the produced outputs from a NN. This is achieved by calculating the difference between the predicted value and the actual value provided by the test dataset. Supervised learning deals with two different problems which is either a classification problem e.g. is the animal on the picture a cat or with regression problems like predicting future bookings. Both of those problems use a different loss function.\cite{loss_func} As this section focuses on solving a regression problem a brief overview of available loss functions and their characteristics are given. 
 
 \begin{table*}[htbp]
 	\centering
@@ -155,12 +156,13 @@ The loss function is one crucial element as they evaluate the accuracy of the pr
 		\hline
 		Square loss &Sensitive to outliers (Model tends to focus on those outliers whereas accuracy for normal values decline)\\
 		 \hline
-		Absolute loss & Outliers do not influence the model as severe as compared to square loss  \\
+		Absolute loss & Outliers do not influence the model as  severe as compared to square loss.  \\
+		\hline
 		Huber & Combination of square loss and absolute loss - Outliers do not influence the accuracy of results and learning from smaller errors can still be done in a efficient way  \\
 		\hline
 		Log-cosh & Similar to Huber when it comes to its characteristics. Does not handle large errors well because the gradient tends to stay constant. \\
 		\hline
-		Quantile loss & Extends absolute loss and provides prediction intervals. Utilizing a punishment system for overestimated and underestimated samples. \\
+		Quantile loss & Extends absolute loss and provides prediction intervals. Utilising a punishment system for overestimated and underestimated samples. \\
 		\hline
 		$\epsilon$-insensitive & Focuses on samples with large prediction errors \\
 		\hline	
@@ -169,11 +171,11 @@ The loss function is one crucial element as they evaluate the accuracy of the pr
 	\caption{Loss functions and their characteristics - [source:\cite{loss_func}]}
 \end{table*}
 
-By looking at the characteristics of the augmented data set shown in figure \ref{fig:augmented_data} it is clear to see that the dataset itself has got outliers repeating themselves every year. To avoid a strong focus on those peaks both models are initial trained utilizing the Adam loss function.
+By looking at the characteristics of the augmented data set shown in figure \ref{fig:augmented_data} it is clear to see that the dataset itself has got outliers repeating themselves every year. To avoid a strong focus on those peaks both models are initially trained utilising the Adam loss function.
 
-\section{Optimize Function}
+\section{Optimise Function}
 \label{sec:optimize_func}
-To optimize a NN's parameters an optimizer function is required. This function updates parameters like weights based on the results provided by the loss function \cite{optimizer}. Since both NN's described in this section make use of backpropagation for their training a literature review was conducted to figure out which optimizer is keen to deliver the most accurate results. By inspecting the advantages and disadvantages proposed by these works \cite{optimizer}\cite{optimizer_1}\cite{optimizer_2} it turns out that the algorithm ADAM is a valid choice. This algorithm is characterized by achieving faster convergence compared to other algorithms. Furthermore Adam provides a decent performance for datasets with meager features.
+To optimise the parameters of a NN an optimiser function is required. This function updates parameters like weights based on the results provided by the loss function \cite{optimizer}. Since both NNs described in this section make use of BP for their training. A literature review was conducted to figure out which optimiser is keen to deliver the most accurate results. By inspecting the advantages and disadvantages proposed by these works \cite{optimizer}\cite{otimizer_1}\cite{optimizer_2} it turns out that the algorithm Adam is a valid choice. This algorithm is characterised by achieving faster convergence compared to other algorithms. Furthermore Adam provides a decent performance for datasets with meager features.
 
 \section{Implementation}
 \label{sec:implementation}
@@ -203,7 +205,7 @@ def get_booking_data():
     return res
 \end{lstlisting}
 
-Once the data is retrieved from the database it is directly converted to a \verb|pandas dataframe|. As mentioned in chapter \ref{sec:data_aug} data augmentation is necessary to compensate the lack of data during COVID19 \ref{sec:data_aug}. Corresponding to the workflow described in figure \ref{fig:workflow} the data now needs to be separated into a training and test set. The training set is used to train the model whereas the test set is used to display how the trained model performs. Therefore the trained model is used to predict the values for timestamps used in the test set. By reviewing other scientific works that deal with time series forecasting \cite{1d_cnn},\cite{cnn_vechicle},\cite{cnn_intro},\cite{lstm_overcome_rnn_problem},\cite{lstm_module},\cite{lstm_stock} the most accurate results are achieved by using ranges from 80\% to 90\% for training and depending on the range for training data a range of 20\% to 10\% for test data are recommended. The initial split used for both models correlates to 90\% training data to 10\% test data as visualized in \ref{fig:training_test} . Therefore the following code is applied to split the data:
+Once the data is retrieved from the database it is directly converted to a \verb|pandas dataframe|. As mentioned in chapter \ref{sec:data_aug} data augmentation is necessary to compensate the lack of data during Covid19. Corresponding to the workflow described in figure \ref{fig:workflow} the data now needs to be separated into a training and test set. The training set is used to train the model whereas the test set is used to evaluate how the trained model performs. Therefore the trained model is used to predict the values for timestamps used in the test set. By reviewing other scientific works that deal with time series forecasting \cite{1d_cnn}\cite{cnn_vechicle}\cite{cnn_intro}\cite{lstm_overcome_rnn_problem}\cite{lstm_module}\cite{lstm_stock} the most accurate results are achieved by using ranges from 80 \% to 90 \% for training and depending on the range for training data a range of 20 \% to 10 \% for test data are recommended. The initial split used for both models correlates to 90\% training data to 10 \% test data as visualised in figure \ref{fig:training_test}. Therefore the following code is applied to split the data:
 \begin{lstlisting}
 training_end = pd.to_datetime('2022-10-31')
 #total range 2017-01-01 - 2023-05-31 = 2342 days
@@ -215,10 +217,10 @@ test = df[training_end:]
 \begin{figure}[H]
 	\centering
 		\includegraphics[width=14cm]{images/training_test}
-	\caption{Visualized Training-Test split (90\%-10\%) - [source:[author]]}
+	\caption{Visualised Training-Test split (90\%-10\%) - [source:[author]]}
 	\label{fig:training_test}
 \end{figure}
-With the training and test data in place the next step is to implement both models (LSTM, CNN) by utilizing the \verb|tensorflow| library. To reduce computation costs and to increase training efficiency the training data is further processed.
+With the training and test data in place the next step is to implement both models (LSTM, CNN) by utilising the \verb|tensorflow| library. To reduce computation costs and to increase training efficiency the training data is further processed in the following way:
 \begin{lstlisting}
 WINDOW = 20
 bookings_training_90 = tf.data.Dataset.from_tensor_slices(train.values)
@@ -226,11 +228,11 @@ bookings_training_90 = bookings_training_90.window(WINDOW + 1, shift=1, drop_rem
 bookings_training_90 = bookings_training_90.flat_map(lambda x: x.batch(WINDOW + 1))
 bookings_training_90 = bookings_training_90.map(lambda x: (x[:-1], x[-1]))
 \end{lstlisting}
-On line 2 the code above transforms the training data into a \verb|TensorSliceDataset|. This data format grants access to tensorflows data API which supports the user to manipulate the data further. As this is time serires data the model itself is fed with data limited to certain ranges. The constant \verb|WINDOW| indicates how many consecutive timestamps are used as input to predict the next time step. The function \verb|flat.map()| is now used to flatten the dataset. As \verb|from_tensor_slices()| creates a single tensor for each entry in a window \verb|flat.map()| combines those windows to a single tensor holding the windowed data. Line 5 prepares the data and splits each window into features and target values. As the learning process described in section \ref{chap:Backpropagation} involves multiple inputs that are used to predict one output the \verb|.map()| function prepares each windowed tensor by using the interval from \verb|x to x-1| to predict \verb|x-1|.
+On line 2 the code above transforms the training data into a \verb|TensorSliceDataset|. This data format grants access to tensorflow's data API which supports the user to manipulate the data further. As this is time series data the model itself is fed with data limited to certain ranges. The constant \verb|WINDOW| indicates how many consecutive timestamps are used as input to predict the next time step. The function \verb|flat.map()| is now used to flatten the dataset. As \verb|from_tensor_slices()| creates a single tensor for each entry in a window \verb|flat.map()| combines those windows to a single tensor holding the windowed data. Line 5 prepares the data and splits each window into features and target values. As the learning process described in section \ref{sec:bp} involves multiple inputs that are used to predict one output the \verb|.map()| function prepares each windowed tensor by using the interval from \verb|x to x-1| to predict \verb|x-1|.
 Both models LSTM and CNN are trained with the prepared data explained in during this section. 
 
 \subsection{Implementation of LSTM}
-The code itself required to setup a LSTM model only requires a few input parameters. Therefore it is crucial to understand the meaning behind the input parameters as well as how they can influence the training results of the model itself. The following code is used to initialize the model:   
+The code itself required to setup a LSTM model only requires a few input parameters. Therefore it is crucial to understand the meaning behind the input parameters as well as how they can influence the training results of the model itself. The following code is used to initialise the model:   
 \begin{lstlisting}
 #define the model
 lstm_booking_prediction_model = Sequential([
@@ -241,10 +243,10 @@ lstm_booking_prediction_model = Sequential([
     Dense(1)
 	])
 \end{lstlisting}
-When utilizing LSTM for time series predictions a certain input format for data is needed. Therefore the Lambda function on line 3 is required to reshape the dimension of the used input data. 
-\verb|Bidirectional()|\footnote{\label{tf_fn}\url{https://www.tensorflow.org/api_docs/python/tf/keras/}} actually represents a wrapper for the actual layer used for this model. In this case its holding additional states and is used to created a Bi-LSTM model as described in \ref{sec:lstm}. \newline
-\verb|LSTM()|\textsuperscript{\ref{tf_fn}} contains the logic actual logic as described in \ref{sec:lstm}. Furthermore the parameter \verb|unit=128|\textsuperscript{\ref{tf_fn}} can be understand as the number of neurons used within this layer. Furthermore this model offers different kind of activation functions. By default the hyperbolic tangent (tanh)\cite{tanh} is used. Whereas the \verb|recurrent_activation| defines which functions are used for the actual gates within the module as described in \ref{sec:lstm}. Whenever creating a stacked LSTM model, which means it makes use of at least two LSTM layers the paramater \verb|return_sequences| must be set to true. Otherwise the layer's output results in a 2D tensor output which only provides information about the last timestep. This format cannot be passed on to the next LSTM layer. \newline
-\verb|Dense()| is used to implement fully connected layers whereas \verb|units| correlate to the amount of neurons used for this layer The last \verb|dense(1)| layer is used to reduce the number of outputs to 1. The way this layer works is explained in section \ref{sec:cnn}. Additional the model needs to be compiled. Therefore the following code is required: 
+When utilising LSTM for time series predictions a certain input format for data is needed. Therefore the Lambda function on line 3 is required to reshape the dimension of the used input data. 
+\verb|Bidirectional()|\footnote{\label{tf_fn}\url{https://www.tensorflow.org/api_docs/python/tf/keras/}} actually represents a wrapper for the actual layer used for this model. In this case it is holding additional states and is used to create a Bi-LSTM model as described in section \ref{sec:lstm}. \newline
+\verb|LSTM()|\textsuperscript{\ref{tf_fn}} contains actual logic as described in section \ref{sec:lstm}. Moreover the parameter \verb|unit=128|\textsuperscript{\ref{tf_fn}} can be understood as the number of neurons used within this layer. Furthermore this model offers different kinds of activation functions. By default the hyperbolic tangent (tanh)\cite{tanh} is used. Whereas the \verb|recurrent_activation| defines which functions are used for the actual gates within the module as described in section \ref{sec:lstm}. Whenever creating a stacked LSTM model, which means it makes use of at least two LSTM layers the parameter \verb|return_sequences| must be set to true. Otherwise the layer's output results in a 2d tensor output which only provides information about the last timestep. This format cannot be passed on to the next LSTM layer. \newline
+\verb|Dense()| is used to implement fully connected layers whereas \verb|units| correlate to the amount of neurons used for this layer. The last \verb|dense(1)| layer is used to reduce the number of outputs to 1. The way this layer works is explained in section \ref{sec:cnn}. Additionally the model needs to be compiled. Therefore the following code is required: 
 \begin{lstlisting}
 #compile the model 
 lstm_booking_prediction_model.compile(
@@ -253,7 +255,7 @@ lstm_booking_prediction_model.compile(
     metrics=['mae']
 	)
 \end{lstlisting}
-The Parameter \verb|loss| sets the loss function which is utilized to evaluate the models performance. The reason why \verb|Huber| is used is explained in section \ref{sec:loss_func}. Futhermore the model also requires an optimizing algorithm. This algorithm is assigned by using the \verb|optimizer| parameter. Due to the results of a literature review explained in section \ref{sec:optimize_func} Adam turned out to be the most promising candidate for this purpose. To observe the capability of learning of a given model the metric mean absolute error (mea) can be used. 
+The parameter \verb|loss| sets the loss function which is utilised to evaluate the models performance. The reason why \verb|Huber| is used is explained in section \ref{sec:loss_func}. Futhermore the model also requires an optimising algorithm. This algorithm is assigned by using the \verb|optimizer| parameter. Due to the results the literature review explained in section \ref{sec:optimize_func} Adam turned out to be the most promising candidate for this purpose. To observe the capability of learning of a given model the metric mean absolute error (MEA) can be used. 
 
 The next step is to start the training of the model as demonstrated below:
 \begin{lstlisting}
@@ -265,7 +267,7 @@ lstm_history = lstm_booking_prediction_model.fit(
     use_multiprocessing=True
 	)
 \end{lstlisting}
-The function \verb|fit()| requires parameters like the data used for training (\verb|bookings_training_90|) as well as how many epochs are processed. One \verb|epoch| covers the process of iterating through the entire training dataset and performing forward and backward propagation as well as updating the model's parameters based on the chosen optimization algorithm.
+The function \verb|fit()| requires parameters like the data used for training (\verb|bookings_training_90|) as well as how many epochs are processed. One \verb|epoch| covers the process of iterating through the entire training dataset and performing forward and backward propagation as well as updating the model's parameters based on the chosen optimisation algorithm.
 \newline
 When training the model using the initial parameters described during this chapter the following results are achieved:
 \begin{figure}[H]
@@ -274,18 +276,18 @@ When training the model using the initial parameters described during this chapt
 	\caption{Decrease of MAE and Trainig loss for 100 epochs - [source:[author]]}
 	\label{fig:training_test}
 \end{figure}
-The training loss in general indicates the performance of the model based on the training set. It is generated through the output of the applied loss function. Low values basically mean that the model is able to catch up patterns within the training set but could also indicate overfitting. This causes the model to just memorize the training set rather than learning actual patterns. Furthermore the loss indicates the amount of required epochs for the model to learn. Whenever the loss stalls or is starting to increase again the training should be stopped. The Mean Absolute Error (MAE) is another metric to observe the ability of the model to learn. The MAE is obtained by calculating the mean of actual values minus the predicted values. This result is divided by the number of observations.\cite{mae} Similar to the training loss a lower value indicates the performance of the model but the MAE needs to be interpreted in context with the range the predictions are made for. For example a MAE of 1 for predictions made in ranges between 1-2 is interpreted as poor performance, whereas a MAE of 100 for predictions made in a range between 100.000 and 1.000.000 indicates a proper result.
+The training loss in general indicates the performance of the model based on the training set. It is generated through the output of the applied loss function. Low values basically mean that the model is able to catch up patterns within the training set but could also indicate overfitting. This causes the model to just memorize the training set rather than learning actual patterns. Furthermore the loss indicates the amount of required epochs for the model to learn. Whenever the loss stalls or is starting to increase again the training should be stopped. The MAE is another metric to observe the ability of the model to learn. The MAE is obtained by calculating the mean of actual values minus the predicted values. This result is divided by the number of observations.\cite{mae} Similar to the training loss a lower value indicates the performance of the model but the MAE needs to be interpreted in context with the range the predictions are made for. For example a MAE of 1 for predictions made in ranges between 1-2 is interpreted as poor performance, whereas a MAE of 100 for predictions made in a range between 100.000 and 1.000.000 indicates a proper result.
 
 \begin{figure}[H]
 	\centering
 		\includegraphics[width=14cm]{images/paper_1_lstm_1_prediction}
-	\caption{Predictions on Test set from 01-01-203 to 01-05-2023 - [source:[author]]}
+	\caption{Predictions on test set from 01-01-203 to 01-05-2023 - [source:[author]]}
 	\label{fig:lstm_1_training_test}
 \end{figure}
-By looking at figure \ref{fig:lstm_1_training_test} its clear to see that the model's performance in terms of accuracy is insufficient. Investigating the training loss and MAE shows that the final MAE of around 0.5 is acceptable in context of the prediction range ranging from 1 to 17. This indicates that the model tends to overfitting as the final training loss is low as well. Section \ref{sec:improve} investigates strageties on how to improve the model's performance.
+By looking at figure \ref{fig:lstm_1_training_test} it is clear to see that the model's performance in terms of accuracy is insufficient. Investigating the training loss and MAE shows that the final MAE of around 0.5 is acceptable in context of the prediction range ranging from 1 to 17. This indicates that the model tends to overfitting as the final training loss is low as well. Section \ref{sec:improving} investigates strategies on how to improve the model's performance.
 
 \subsection{Implementation of CNN}
-Similar to the implementation of LSTM the implementation of a CNN does not require much code. Furthermore some parts of the code use the same parameters. Those parameters are not explained again. To initialize a CNN model the following code is required: 
+Similar to the implementation of LSTM the implementation of a CNN does not require much code. Furthermore some parts of the code use the same parameters. Those parameters are not explained again. To initialise a CNN model the following code is required: 
 
  \begin{lstlisting}
 #define the model 
@@ -299,8 +301,8 @@ Similar to the implementation of LSTM the implementation of a CNN does not requi
     Dropout(0.4),
     Dense(1)
 \end{lstlisting}
-\verb|Conv1D()| is used to add one one dimensional CL to the model. Those Layers work as described in \ref{sec:cnn}.  The \verb|filter| parameter is equivalent to the number of neurons this layer is going to use. Furthermore the kernel's size as explained in \ref{sec:cnn} is determined by the parameter \verb|kernel_size|.
-The only difference left in comparison to the LSTM layer is the FL \ref{sec:cnn}. This layer is added by utilizing the \verb|Flatten()| parameter. When it comes to compiling and fitting the model the CNN makes use of  \verb|Huber()| for its loss function and \verb|Adam()| for its optimization function contrary to the implementation of the LSTM model. Furthermore both models are initially using 100 epochs for their first training. \newline
+\verb|Conv1D()| is used to add one 1d CL to the model. Those layers work as described in section \ref{sec:cnn}.  The \verb|filter| parameter is equivalent to the number of neurons this layer is going to use. Furthermore the kernel's size as explained in section \ref{sec:cnn} is determined by the parameter \verb|kernel_size|.
+The only difference left in comparison to the LSTM layer is the FL describe in section \ref{sec:cnn}. This layer is added by utilising the \verb|Flatten()| parameter. When it comes to compiling and fitting the model the CNN makes use of  \verb|Huber()| for its loss function and \verb|Adam()| for its optimisation function contrary to the implementation of the LSTM model. Furthermore both models are initially using 100 epochs for their first training. \newline
 
 The first training results produced by the CNN model look the following: 
 
@@ -310,22 +312,22 @@ The first training results produced by the CNN model look the following:
 	\caption{Decrease of MAE and Trainig Loss for 100 epochs - [source:[author]]}
 	\label{fig:training_test_cnn}
 \end{figure}
-When analysing the metrics in highlighted in figure \ref{fig:training_test_cnn} it is clear to see that both the training loss and the MAE are still very high after 100 epochs. This indicates that the model needs to be trained utilizing more epochs. The results of the training loss as well as the MAE are reflected also in the actual predictions made on the test set.
+When analysing the metrics highlighted in figure \ref{fig:training_test_cnn} it is clear to see that both the training loss and the MAE are still very high after 100 epochs. This indicates that the model needs to be trained utilising more epochs. The results of the training loss as well as the MAE are reflected also in the actual predictions made on the test set.
 
 \begin{figure}[H]
 	\centering
 		\includegraphics[width=14cm]{images/cnn_1_prediction}
-	\caption{Predictions on Test set from 01-01-203 to 01-05-2023 - [source:[author]]}
-	\label{fig:lstm_1_training_test}
+	\caption{Predictions on test set from 01-01-203 to 01-05-2023 - [source:[author]]}
+	\label{fig:cnn_1_training_test}
 \end{figure}
-By looking at the results of the predicted values its clear to see that the model's performance is poor. During it's training the model was not capable of obtaining the trainings set characteristics. Strategies on how to potentially improve the models accuracy are discussed in ref{sec:improving} 
+By looking at figure \ref{fig:cnn_1_training_test} it is clear to see that the model's performance is poor. During it is training the model was not capable of obtaining the training's set characteristics. Strategies on how to potentially improve the models accuracy are discussed in section \ref{sec:improving}.
 
 \section{Improving the models}
 \label{sec:improving}
-There are several strategies that can be followed in order to improve a models performance. One option is to enhance the data preprocessing. Therefore the available data set is normalized. One approach that can be utilized is Min-Max Normalisation \cite{min_max}. Following this approach the original data is brought into a range from values between 0 and 1 by keeping the actual ratio of the test and training data. 
+There are several strategies that can be followed in order to improve a model's performance. One option is to enhance the data preprocessing. Therefore the available data set is normalised. One approach that can be utilised is Min-Max Normalisation \cite{min_max}. Following this approach the original data is brought into a range from values between 0 and 1 by keeping the actual ratio of the test and training data. 
 Another approach is called feature engineering \cite{feature_eng}. Following this strategy further features are extracted from the available dataset. This process results in a multivariate prediction model \cite{multi}.
-Additional possibilities to enhance a model's performance is to change its architecture. This implies methods like utilizing multiple \verb|Conv1D| layers or stacking several LSTM layers. Applying this approach lead to more complex models which might improve a NN ability to find patterns within the available dataset. Similar to this approach the tuning of a model's parameters also called hyperparameter tuning.  This method applies different configurations of parameters to train the model and compares their results. Looking at the implementation of the LSTM  and CNN model described in section \ref{sec:implementation} parameters like \verb|epochs|, \verb|window|, \verb|units|(LSTM) or \verb|filters|(CNN), and \verb|Dropout|. As there is no model that fits all purposes those parameters are updated during an iterative process. \newline
-One of the approaches to increase the models performance in this section is a combination of changing the architecture of both models as well as changing their hyper parameters. 
+Additional possibilities to enhance a model's performance is to change its architecture. This implies methods like utilising multiple \verb|Conv1D| layers or stacking several LSTM layers. Applying this approach leads to more complex models which might improve a NN's ability to find patterns within the available dataset. Similar to this approach the tuning of a model's parameters is also called hyperparameter tuning.  This method applies different configurations of parameters to train the model and compares their results. Looking at the implementation of the LSTM  and CNN model described in section \ref{sec:implementation} parameters like \verb|epochs|, \verb|window|, \verb|units|(LSTM) or \verb|filters|(CNN), and \verb|Dropout|. As there is no model that fits all purposes those parameters are updated during an iterative process. \newline
+One of the approaches to increase the model's performance in this section is a combination of changing the architecture of both models as well as changing their hyper parameters. 
 
 \subsection{Adapting the Architecture and Hyperparameter tuning}
 \label{sec:hyper}
@@ -440,13 +442,13 @@ Dense(1))
    CNN 3& \usebox{\codeboxsix} & 500 & 0.21 & 0.43 \\
   \hline
 \end{tabular}
-\caption{Various model combinations including Epochs, final loss and final MAE - [source:[author]]}
+\caption{Various model combinations including epochs, final loss and final MAE - [source:[author]]}
 	\label{tab:models}
 \end{table}
 
-By observing the results from table \ref{tab:models} it is clear to see that by increasing the epochs for approaches using CNN the actual loss as well as the MAE decreased. Never the less as illustrated in figure \ref{fig:combined_model} both models (CNN 3 and LSTM 3) still were not able to catch up the characteristics of the training set. Whereas some predictions are on point the majority of predictions are shifted. Neither increasing nor decreasing the models complexities in terms of its architecture supported the model to further improve its accuracy for predictions based on the test set.
+By observing the results from table \ref{tab:models} it is clear to see that by increasing the epochs for approaches using CNN the actual loss as well as the MAE decreased. Nevertheless as illustrated in figure \ref{fig:combined_model} both models (CNN 3 and LSTM 3) still were not able to catch up the characteristics of the training set. Whereas some predictions are on point the majority of predictions are shifted. Neither increasing nor decreasing the models' complexities in terms of architecture; supported the models to further improve their accuracy for predictions based on the test set.
 This behaviour indicates that only one feature might be insufficient for the models to find patterns that increase their ability to predict demand for buses on a certain day.
-Therefore section \ref{sec:feature_eng} investigates which potential features can be extracted from the current dataset as well as their impact on prediction accuracy. Although none of the trained models achieve adequate results models that used LSTM achieved better results throughout the whole process. Therefore only LSTM models are utilized during section \ref{sec:feature_eng}.
+Therefore section \ref{sec:feature_eng} investigates which potential features can be extracted from the current dataset as well as their impact on prediction accuracy. Although none of the trained models achieve adequate results models that used LSTM achieved better results throughout the whole process. Therefore only LSTM models are utilised during section \ref{sec:feature_eng}.
 \begin{figure}[H]
 	\centering
 		\includegraphics[width=14cm]{images/combined_prediction}
@@ -457,7 +459,7 @@ Therefore section \ref{sec:feature_eng} investigates which potential features ca
 \subsection{Feature Engineering}
 \label{sec:feature_eng}
 Feature Engineering (FE) is used to create new input values also called features. Those values are further used to enhance a model's capability of learning. \cite{feature_eng_2} The approaches before used the whole timestamp \verb|tasTime_from| resulting that only one feature is available to train the models.  
-Looking at the structure of a date like 2023-01-01 additional features become visible. Those values can be extracen and used to train the model.  The structure essentially hosts aspects like \verb|day of the month|, \verb|month|,\verb|year|, \verb|quarter of the year| as well as \verb|week of the year|. Furthermore this approach provides the possibility to provide additional context to the model like holidays. The insights gathered during chapter \ref{chap:insights} furthermore revealed the seasonal patterns. By extracting those characteristics form every single date more features become available train the model. As the LSTM model in general looks like the more suitable candidate due to the past results it provided during section \ref{sec:implementation} and \ref{sec:hyper} the approach of feature engineering is only applied onto the LSTM approach.
+Looking at the structure of a date like 2023-01-01 additional features become visible. Those values can be extracted and used to train the model.  The structure essentially hosts aspects like \verb|day of the month|, \verb|month|,\verb|year|, \verb|quarter of the year| as well as \verb|week of the year|. Furthermore this approach provides the possibility to provide additional context to the model like holidays. The insights gathered during chapter \ref{chap:insights} furthermore revealed  seasonal patterns. By extracting those characteristics form every single date more features become available to train the model. As the LSTM model in general looks like the more suitable candidate due to the past results it provided during section \ref{sec:implementation} and section \ref{sec:hyper} the approach of feature engineering is only applied onto the LSTM approach.
 \newline
 In order to extract additional features the following code is applied: 
 \begin{lstlisting}
@@ -474,8 +476,8 @@ df["main_season"] = np.where(df["month"].isin([5, 6, 7, 8, 9]), 1, 0)
 df["off_season"] = np.where(df["month"].isin([5, 6, 7, 8, 9]), 0, 1)
 df["ut"] = (df["bookings"] > high_ut).astype(float)
 \end{lstlisting}
-The initial dataframe remains untouched and got the same structure as in section \ref{sec:implementation}. As the index of the \verb|df| is initialized as \verb|pd.to_datetime()| operations like \verb|index.month|, \verb|index.day| etc. become available. Those functions extract the values based on each index available within the dataframe. 
-For the initial training of the multivariate LSTM model the following architecture and parameters are used. 
+The initial dataframe remains untouched and got the same structure as in section \ref{sec:implementation}. As the index of the \verb|df| is initialised as \verb|pd.to_datetime()| operations like \verb|index.month|, \verb|index.day| etc. become available. Those functions extract the values based on each index available within the dataframe. 
+For the initial training of the multivariate LSTM model the following architecture and parameters are used:
 \begin{lstlisting}
 Bidirectional(LSTM(120,return_sequences=True,
               input_shape=(X_train.shape[1],X_train.shape[2]))),
@@ -496,7 +498,7 @@ Y_train,
 epochs=200, 
 )
 \end{lstlisting}
-As this model now utilizes multiple features the parameter \verb|input_shape| needs to be set.  \verb|X_train.shape[1]| represents the number of time steps whereas \verb|X_train.shape[2]| represents the number of features utilized for each time step. Furthermore \verb|lstm_model.fit| receives now two input values whereas \verb|X_train| indicates the input features and \verb|Y_train| represents the actual output of a certain time step. For previous models only one input was required due to the way the data is structured. 
+As this model now utilises multiple features the parameter \verb|input_shape| needs to be set.  \verb|X_train.shape[1]| represents the number of timesteps whereas \verb|X_train.shape[2]| represents the number of features utilised for each timestep. Furthermore \verb|lstm_model.fit| receives now two input values whereas \verb|X_train| indicates the input features and \verb|Y_train| represents the actual output of a certain time step. For previous models only one input was required due to the way the data is structured. 
 The training results of the model are highlighted in figure \ref{fig:lstm_multi_1_mae} and \ref{fig:lstm_multi_1_prediction} 
 \begin{figure}[H]
 	\centering
@@ -504,18 +506,18 @@ The training results of the model are highlighted in figure \ref{fig:lstm_multi_
 	\caption{Change of Loss and MAE - [source:[author]]}
 	\label{fig:lstm_multi_1_mae}
 \end{figure}
-Both the final loss (0.25) and MAE (0.30) are almost identical to the results achieved for the previous models. The major difference is the actual prediction results on the test data highlighted in figure \ref{fig:lstm_multi_1_prediction}. It is clear to see that the model's performance increased dramatically. This behaviour indicates that the models were overfitting the data and not being able to create accurate predictions on the test data. By increasing the context to the LSTM model utilizing additional features the models performance on unseen data increased as well. 
+Both the final loss (0.25) and MAE (0.30) are almost identical to the results achieved for the previous models. The major difference is the actual prediction results on the test data highlighted in figure \ref{fig:lstm_multi_1_prediction}. It is clear to see that the model's performance increased dramatically. This behaviour indicates that the model was overfitting the data and not being able to create accurate predictions on the test data. By increasing the context to the LSTM model utilising additional features the models performance on unseen data increased as well. 
 \begin{figure}[H]
 	\centering
 		\includegraphics[width=14cm]{images/lstm_multi_1_prediction}
-	\caption{Predictions on test set from 01-01-203 to 01-05-2023 - [source:[author]]}
+	\caption{Predictions on test set from 2023-01-01 to 01-05-2023 - [source:[author]]}
 	\label{fig:lstm_multi_1_prediction}
 \end{figure}
-Looking at the results in figure \ref{fig:lstm_multi_1_prediction} the enhanced LSTM model is capable of catching up the trends present in the test data. Section \ref{sec:pred_and_ym} discusses the achieved results and weather or not they the model can be used to support the current  YM in place.
+Looking at the results in figure \ref{fig:lstm_multi_1_prediction} the enhanced LSTM model is capable of catching up the trends present in the test data. Section \ref{sec:pred_and_ym} discusses the achieved results and whether or not the model can be used to support the current YM in place.
 
-\section{Predictions And Yield Management}
+\section{Predictions and Yield Management}
 \label{sec:pred_and_ym}
-To determine weather or not the model can be utilized to support the YM knowledge about how far in advanced buses are booked is crucial. By computing the median timespan utilizing the attributes \verb|createdAt| and \verb|tasTime_from| this information can be gathered from the available dataset. The median timespan between \verb|createdAt| and \verb|taskFrom_time| is around 38 days. Throughout the whole implementation process which included the training of various model architectures as well as singelvariate and multivariate models, models utilizing LSTM achieved the best results. 
+To determine whether or not the model can be utilised to support the YM knowledge about how far in advance buses are booked is crucial. By computing the median timespan utilising the attributes \verb|createdAt| and \verb|tasTime_from| this information can be gathered from the available dataset. The median timespan between \verb|createdAt| and \verb|taskFrom_time| is around 38 days. Throughout the whole implementation process which included the training of various model architectures as well as singelvariate and multivariate models, models utilizing LSTM achieved the best results. 
 
-By looking at the final result achieved in figure \ref{fig:lstm_multi_1_precition} it is clear to see that the model has the ability to predict future data. Although the results are not perfect for each day the model is able to recognize trends present in the test data. Whereas prediction might be off sometimes the achieved results still can be utilized to support the YM. As YM can have a tremendous influence on customers decisions to weather or not they book a bus since it changes the pricing security mechanisms need to be set in place. On the one hand predictions are personally checked if they are feasible or not. Furthermore the predictions are set in context with previous years. This context involves seasonal trends and takes holidays in Austria, Germany, Switzerland and Lichtenstein into account. Especially predictions for Easter holidays are monitored since they might occur during different seasons. Additionally the model's performance is continuously monitored and a training schedule is set in place.
-As the median for bookings in advance is around 38 the results achieved for on the test data determine that this range can be predicted reliable.
+By looking at the final result achieved in figure \ref{fig:lstm_multi_1_prediction} it is clear to see that the model has the ability to predict future data. Although the results are not perfect for each day the model is able to recognise trends present in the test data. Whereas prediction might be off sometimes the achieved results still can be utilised to support the YM. As YM can have a tremendous influence on customers' decisions to whether or not they book a bus since it changes the pricing security mechanisms need to be set in place. On the one hand predictions are personally checked if they are feasible or not. Furthermore the predictions are set in context with previous years. This context involves seasonal trends and takes holidays in Austria, Germany, Switzerland and Liechtenstein into account. Especially predictions for Easter holidays are monitored since they might occur during different seasons. Additionally the model's performance is continuously monitored and a training schedule is set in place.
+As the median for bookings in advance is around 38 days the results achieved for on the test data determine that this range can be predicted accurately.

@@ -12,17 +12,17 @@
 
 \chapter{Implementation of Averages and Grouping}
 \label{chap:analytical_dashboard}
-Since this paper aims to extract metrics that can contribute to an analytical dashboard this section focuses on the implementation of various groupings as well as their visualization. As the analytical dashboard is web based a short overview about its technical setup is given in section \ref{sec:tech_set}.
+Since this paper aims to extract metrics that can contribute to an analytical dashboard this section focuses on the implementation of various groupings as well as their visualisation. As the analytical dashboard is web based a short overview of its technical setup is given in section \ref{sec:tech_set}.
 
 \section{Technical Setup}
 \label{sec:tech_set}
-As those implementations will contribute to an analytical dashboard the visualization of the prepared data are implemented using React. For each grouping a separate React component is created. Communication between the front- and backend is accomplished using a Rest interface. 
+As those implementations will contribute to an analytical dashboard the visualisation of the prepared data is implemented using React. For each grouping a separate React component is created. Communication between the front- and backend is accomplished using a Rest interface. 
 
 \begin{itemize}
 \item  \verb|React|\footnote{https://react.dev/} - used for visualization
 \item \verb|Python|\footnote{https://www.python.org/} - used to implement the grouping logic and interaction with the database
-\item \verb|fastapi|\footnote{https://fastapi.tiangolo.com/} - Rest interface (Connection between Backend and Frontend) 
-\item \verb|geopy|\footnote{https://geopy.readthedocs.io/en/stable/} - Used for calculations on latitude and longitude 
+\item \verb|fastapi|\footnote{https://fastapi.tiangolo.com/} - Rest interface (Connection between backend and frontend) 
+\item \verb|geopy|\footnote{https://geopy.readthedocs.io/en/stable/} - used for calculations on latitude and longitude 
 \end{itemize}
 \section{Grouping Implementation}
 
@@ -59,10 +59,10 @@ radius = 20
             res[key].append(point_a)
 \end{lstlisting}
 This logic performs the comparison between two geographical entries. Whenever \verb|point\_b| is within a 20km radius of the departure and destination area from \verb|point\_a| \verb|point\_b| is added to the group from \verb|point\_a|. Utilizing the demonstrated database design makes it possible to still include filters like date ranges to filter groupings by date. Furthermore the averages for attributes explained in section \ref{sec:averages} can be utilized and compared to evaluate certain trends. By adjusting the logic above and removing the constraint that both destination and departure has to be within a certain range this data can further be grouped into popular destination places as well as popular departure places. Depending on the grouping technique various insights can be gathered. By analysing grouped data that mark routes (same departure/destination radius) the pricing strategy for routes with high demand can be adapted. Whereas analysing the grouping on departure places with high traffic bus operators might consider to expand their maximum approaching distance. Furthermore by changing the way how the data is fetched from the database by querying results where no bus was offered \verb|amountSearchResults == 0| a different grouping becomes available for analysing. 
-\subsubsection{Visualization}
-Depending on how the entries are grouped different Visualization techniques are applied. To detect departure areas with high demand a heatmap is utilized. Therefore a interactive map is utilized. Onto this map areas with high demand are plotted following a color scheme. Red circles indicate high demand whereas blue areas indicate areas with less demand as shown in figure \ref{fig:heatmap_dep}. Furthermore this visualization can be filtered by applying date ranges. Additionally areas with high demand are displayed in a table including total count of requests for a certain area, average pax as well as the average travel distance.
+\subsubsection{Visualisation}
+Depending on how the entries are grouped different visualization techniques are applied. To detect departure areas with high demand a heatmap is utilised. Therefore an interactive map is utilized. Onto this map areas with high demands are plotted following a color scheme. Red circles indicate high demand whereas blue areas indicate areas with less demand as shown in figure \ref{fig:heatmap_dep}. Furthermore this visualization can be filtered by applying date ranges. Additionally areas with high demand are displayed in a table including total count of requests for a certain area, average pax as well as the average travel distance.
 \newline
-As a heatmap is not suitable to visualize the grouped routes those groupings are displayed using a table. Additional the table is filterable by date in order to be able to analyse the data split up into certain time periods. Furthermore the table hosts information about average pax and average travel distance. 
+As a heatmap is not suitable to visualise the grouped routes those groupings are displayed using a table. Additionally the table is filterable by date in order to be able to analyse the data split up into certain time periods. Furthermore the table hosts information about average pax and average travel distance. 
 \begin{figure}[H]
 	\centering
 		\includegraphics[width=15cm]{images/heatmap_dep}
@@ -97,8 +97,8 @@ def group_requests_by_day(data):
     res = sorted(res, key=lambda x: x['day'])
     return res
 \end{lstlisting}
-Depending on which attribute e.g. \verb|createdAt| \verb|taskFrom_time| are fetched from the database different groupings become available. Both attributes provide valuable information. When the data is grouped by utilizing the attribute \verb|createdAt| the success rate of previous marketing campaigns can be evaluated. Furthermore this information can be consulted to plan future marketing campaigns. By grouping the data using the attribute \verb|taskFrom_time| seasonal patterns become visible as shown in \ref{fig:dep_grouping}
-\subsubsection{Visualization}
+Depending on which attribute e.g. \verb|createdAt| \verb|taskFrom_time| is fetched from the database different groupings become available. Both attributes provide valuable information. When the data is grouped by utilising the attribute \verb|createdAt| the success rate of previous marketing campaigns can be evaluated. Furthermore this information can be consulted to plan future marketing campaigns. By grouping the data using the attribute \verb|taskFrom_time| seasonal patterns become visible as shown in \ref{fig:dep_grouping}
+\subsubsection{Visualisation}
 The hourly groupings are visualized using a line chart as demonstrated in figure \ref{fig:hourly_grouping}.
 \begin{figure}[H]
 	\centering
