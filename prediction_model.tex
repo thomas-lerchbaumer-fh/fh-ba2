@@ -83,7 +83,7 @@ The LSTM module or Repeating module consist of four NN layers which interact tog
 \begin{figure}[H]
 	\centering
 		\includegraphics[width=14cm]{images/lstm_module}
-	\caption{***PLACEHOLDER Repeating LSTM module - [source:\cite{lstm_module}]}
+	\caption{Repeating LSTM module - [source:\cite{lstm_module}]}
 	\label{fig:lstm_rep_model}
 \end{figure}
 In total the repeating model has three gate activation functions which are named $\sigma_1$, $\sigma_2$,  $\sigma_3$ and shown in figure \ref{fig:lstm_rep_model}. Furthermore $\sigma_1$ and $\sigma_2$ act as output activation functions too. The cell state is illustrated using a blue line which starts at St-1 and indicates the previous memory block to St representing the current memory block. The amount of information that is passed is regulated by layer  $\sigma_1$ using the following function:
@@ -122,7 +122,7 @@ CNNs follow the concept of NN consisting of multiple layers. The scope of applic
 \begin{figure}[H]
 	\centering
 		\includegraphics[width=10cm]{images/1d_cnn_model}
-	\caption{**PLACEHOLDER One Dimensional CNN Structure - [source:\cite{cnn_vechicle}]}
+	\caption{One Dimensional CNN Structure - [source:\cite{cnn_vechicle}]}
 	\label{fig:cnn_struct}
 \end{figure}
 
@@ -141,7 +141,7 @@ The pooling layer as shown in figure \ref{fig:cnn_struct} is deployed within a N
 
 %The activation function is also part of the fully connected layer. This layer applies the activation function onto the feature map and enables the model in combination with BP to learn complex connections between features. Furthermore this layer operates on the already flatten feature map and outputs a 2d vector.\cite{1d_cnn}
 
-The flatten layer transforms two dimensional input data into one dimensional input vectors. Its output is used to provide values to the fully connected layer. Overfitting can be caused whenever all features are used in the flatten layer. Therefore a dropout layer can be set in place.****CITEHERE**** This layer cancels out neurons during the training process of a NN which reduces the model's size. 
+The flatten layer transforms two dimensional input data into one dimensional input vectors. Its output is used to provide values to the fully connected layer. Overfitting can be caused whenever all features are used in the flatten layer. Therefore a dropout layer can be set in place.\cite{1d_cnn} This layer cancels out neurons during the training process of a NN which reduces the model's size. 
 
 \section{Loss Function}
 \label{sec:loss_func}
@@ -216,7 +216,7 @@ test = df[training_end:]
 \end{lstlisting}
 \begin{figure}[H]
 	\centering
-		\includegraphics[width=14cm]{images/training_test}
+		\includegraphics[width=14cm]{images/1st_model_training_split}
 	\caption{Visualised Training-Test split (90\%-10\%) - [source:[author]]}
 	\label{fig:training_test}
 \end{figure}
