@@ -97,25 +97,25 @@ def group_requests_by_day(data):
     res = sorted(res, key=lambda x: x['day'])
     return res
 \end{lstlisting}
-Depending on which attribute e.g. \verb|createdAt| \verb|taskFrom_time| is fetched from the database different groupings become available. Both attributes provide valuable information. When the data is grouped by utilising the attribute \verb|createdAt| the success rate of previous marketing campaigns can be evaluated. Furthermore this information can be consulted to plan future marketing campaigns. By grouping the data using the attribute \verb|taskFrom_time| seasonal patterns become visible as shown in \ref{fig:dep_grouping}
+Depending on which attribute e.g. \verb|createdAt| or \verb|taskFrom_time| is fetched from the database different groupings become available. Both attributes provide valuable information. When the data is grouped by utilising the attribute \verb|createdAt| the success rate of previous marketing campaigns can be evaluated. Furthermore this information can be consulted to plan future marketing campaigns. By grouping the data using the attribute \verb|taskFrom_time| seasonal patterns become visible as shown in \ref{fig:dep_grouping}
 \subsubsection{Visualisation}
-The hourly groupings are visualized using a line chart as demonstrated in figure \ref{fig:hourly_grouping}.
+The hourly groupings are visualised using a line chart as demonstrated in figure \ref{fig:hourly_grouping}.
 \begin{figure}[H]
 	\centering
 		\includegraphics[width=15cm]{images/requests_hour}
 	\caption{***PLACEHOLDER Requests grouped on hourly basis- [source:[author]]}
 	\label{fig:hourly_grouping}
 \end{figure}
-By analysing figure \ref{fig:hourly_grouping} the highest the most search requests are made at around 9am. By hovering over each data point the amount of search requests become visible. 
+By analysing figure \ref{fig:hourly_grouping} the highest number of the most search requests are made at around 9 am. By hovering over each data point the amount of search requests become visible. 
 \newline
  
 \begin{figure}[H]
 	\centering
 		\includegraphics[width=15cm]{images/grouping_by_taskFrom}
-	\caption{ **PLACEHOLDER Daily grouping of Departure Dates- [source:[author]]}
+	\caption{ **PLACEHOLDER Daily grouping of departure dates- [source:[author]]}
 	\label{fig:grouping_dep_daily}
 \end{figure}
-The grouping by day is visualized by an heatmap mapped to an calendar. By investigating the results for different years seasonal patterns become visible.
+The grouping by day is visualized by a heatmap mapped to an calendar. By investigating the results for different years seasonal patterns become visible.
 \begin{figure}[H]
 	\centering
 		\includegraphics[width=15cm]{images/grouping_by_created_at}
