@@ -21,16 +21,18 @@ Both models are implemented using Python and the following libraries:
 \item \verb|keras|\footnote{https://keras.io/} - Neural Network library
 \end{itemize}
 
-As there are various models available a literature review is conducted to figure out which models fit the purpose of time series forecasting. It turns out that the most promising NNs that can be utilised for time series prediction are either Convolutional Neural Networks (CNN) or Recurrent Neural Networks (RNN) especially Long Short-Term Memory (LSTM)\cite{nn_1}\cite{nn_2}\cite{lstm_1}\cite{lstm_2}\cite{rnn_time_series_predict}.
+As there are various models available a literature review is conducted to figure out which models fit the purpose of time series forecasting. It turns out that the most promising NNs that can be utilised for time series prediction are either Convolutional Neural Networks (CNN) or RNN especially LSTM\cite{nn_1}\cite{nn_2}\cite{lstm_1}\cite{lstm_2}\cite{rnn_time_series_predict}.
 
 \section{Backpropagation}
 \label{sec:bp}
 
 As both of the models LSTM and CNN use Backpropagation (BP) for its training the basic concepts of the algorithm are explained in this section. To understand the logic of BP a few terms need a detailed explanation: 
 \subsubsection{Gradient}
-The gradient also called gradient descent is an algorithm that is used to optimise the loss function within BP. That means that the gradient descent indicates by how much the weights and biases need to be adjusted in order to reduce the actual error value which is the result of the applied loss function. \cite{bp_basic}
+The gradient also called gradient descent is a technique utilised to optimise the loss function used within BP. 
+This implies that the gradient descent shows how the weights and biases should be changed in order to decrease the actual error value, which is the outcome of the applied loss function.
+ \cite{bp_basic}
 \subsubsection{Bias}
-The bias is an additional parameter used in each neuron of a NN. It is used to directly influence the activation function to offset the results either to the negative or positive direction. When looking at the sigmoid function without any bias in place where \verb|x| correlates to the input value and \verb|w| indicates the used weight: 
+The bias is an additional parameter used in each neuron of a NN. It is used to directly influence the activation function to offset the results either to the negative or positive direction \cite{bias}. When looking at the sigmoid function without any bias in place where \verb|x| correlates to the input value and \verb|w| indicates the used weight: 
 \begin{equation}
  \sigma(x) = \frac{1} {1 + e^{-{(w*x)}}}
 \label{eq:eq_4}
@@ -56,10 +58,11 @@ By adding the bias value as constant to the sigmoid function can be shifted alon
 \end{figure}
 The bias therefore is utilised to directly influence the result of the activation function and whether or not a certain neuron is activated or not. 
 \subsubsection{Activation Function}
-Activation functions introduce non-linearity characteristics to NN. This function is applied to the output of a neuron and decides whether or not a neuron is activated or not.\cite{activation} In combination with the descent gradient this function enables the NN to learn complex patterns within a training set. Originally the sigmoid function \cite{bp_basic} was used as activation function for NN but as of today multiple other functions like softmax, Tanh, ReLu emerged \cite{activation}.
+Activation functions introduce non-linearity characteristics to NN. This function is applied to the output of a neuron and decides whether or not a neuron is activated or not.\cite{activation} In combination with the descent gradient this function enables the NN to learn complex patterns within a training set.
+The sigmoid function \cite{bp_basic} was first employed as the activation function for NN, but as of today, several additional functions, including softmax, Tanh, and ReLu, have evolved \cite{activation}.
 
 \subsubsection{Phases} 
- Backpropagation follows an iterative process. At the beginning there is the feed forward pass. During this phase the input data is passed through all layers. Each hidden layer applies a linear function to create certain weights those outputs then are fed to the activation function. Depending on how many hidden layers are used within the NN the output of the activation function is used as input for the next neuron. At the end the predicted outputs by the model are compared with the actual outputs of the training data. This comparison is evaluated through a loss function. At this step the actual learning process of the model starts by calculating the gradient of the loss function considering the output of the NN. After that the back pass is initiated. Along this phase the gradients of each previous layer are multiplied with a local gradient and its weights which results in a gradient in respect to the layer's input. After receiving all gradients  based on the network's input data, all weights and biases are updated and optimised to reduce the result of the loss function. The steps forward pass, loss calculation, back pass, and the updates of weights and biases are repeated to improve the network in an iterative way. \cite{bp_basic} Figure \ref{fig:bp} demonstrates the logic of the backpropagation algorithm. Whereas \verb|wu| represents the updated weights after each iteration.  
+Backpropagation follows an iterative process. At the beginning there is the feed forward pass. During this phase the input data is passed through all layers. Each hidden layer applies a linear function to create certain weights those outputs then are fed to the activation function. The output of the activation function is utilized as the input for the following neuron, depending on how many hidden layers are employed in the NN. At the end the predicted outputs by the model are compared with the actual outputs of the training data. This comparison is evaluated through a loss function. At this step the actual learning process of the model starts by computing the gradient of the loss function based on the output of the NN. After that the back pass is initiated. Along this phase the gradients of each previous layer are multiplied with a local gradient and its weights which results in a gradient in respect to the layer's input. After receiving all gradients  based on the network's input data, all weights and biases are updated and optimised to reduce the result of the loss function. The steps forward pass, loss calculation, back pass, and the updates of weights and biases are repeated to improve the network in an iterative way. \cite{bp_basic} Figure \ref{fig:bp} demonstrates the logic of the backpropagation algorithm. Whereas \verb|wu| represents the updated weights after each iteration.  
 
 \begin{figure}[H]
 	\centering
@@ -68,7 +71,7 @@ Activation functions introduce non-linearity characteristics to NN. This functio
 	\label{fig:bp}
 \end{figure}
 \section{The Models}
-Both models CNN and RNN/LSTM can be used for time series forecasting. To create accurate prediction models a basic knowledge of the models functionalities are required. Therefore this section explains the components of each NN as well as the approaches those models follow. 
+Time series forecasting can be performed using CNN and RNN/LSTM models. To create accurate prediction models a basic knowledge of the models functionalities are required. Therefore this section explains the components of each NN as well as the approaches those models follow. 
 
 \subsection{LSTM}
 \label{sec:lstm}
@@ -92,7 +95,7 @@ cf_t = \sigma_1 (W_cf * [O_t-1, x_t] + b_cf)
 \cite{lstm_module}
 \label{eq:eq_1}
 \end{equation}
-Furthermore two network layers are used to store new information to the cell state. Therefore sigmoid layer $\sigma_2$ chooses the values which are updated by utilising the following formula:
+To store fresh information to the cell state, two network layers are employed. Therefore sigmoid layer $\sigma_2$ chooses the values which are updated by utilising the following formula:
 \begin{equation}
 l_t = \sigma_2(W_1 *[O_t-1, x_t]+ b_l)
 \cite{lstm_module}
@@ -118,7 +121,7 @@ Bidirectional LSTMs are able to look in both directions past and future. This is
 
 \subsection{CNN}
 \label{sec:cnn}
-CNNs follow the concept of NN consisting of multiple layers. The scope of application for this kind of network reaches from computer vision problems to time-series forecast modelling. Whereas data provided for image classification is structured in multi dimensional arrays (matrices), data used for time-series forecasting is provided via one dimensional arrays.\cite{cnn_intro} A CNN provides different types of layers. Those layer types are called Pooling Layer (PL), Fully Connected (FC), Convolution layer (CL) and flatten layer (FL). The connection of those layers are demonstrated in figure \ref{fig:cnn_struct}.
+CNNs follow the concept of NN consisting of multiple layers. The scope of application for this kind of network reaches from computer vision problems to time-series forecast modelling. Whereas data provided for image classification is structured in multi dimensional arrays (matrices), data used for time-series forecasting is provided via one dimensional arrays.\cite{cnn_intro} A CNN provides different types of layers. Those layer types are called Pooling Layer (PL), Fully Connected (FC), Convolution layer (CL) and Flatten layer (FL). The connection of those layers are demonstrated in figure \ref{fig:cnn_struct}.
 \begin{figure}[H]
 	\centering
 		\includegraphics[width=10cm]{images/1d_cnn_model}
@@ -141,11 +144,11 @@ The pooling layer as shown in figure \ref{fig:cnn_struct} is deployed within a N
 
 %The activation function is also part of the fully connected layer. This layer applies the activation function onto the feature map and enables the model in combination with BP to learn complex connections between features. Furthermore this layer operates on the already flatten feature map and outputs a 2d vector.\cite{1d_cnn}
 
-The flatten layer transforms two dimensional input data into one dimensional input vectors. Its output is used to provide values to the fully connected layer. Overfitting can be caused whenever all features are used in the flatten layer. Therefore a dropout layer can be set in place.\cite{1d_cnn} This layer cancels out neurons during the training process of a NN which reduces the model's size. 
+The FL converts two dimensional input data into one dimensional input vectors. Its output is used to provide values to the FC layer. Its output is used to provide values to the fully connected layer. Overfitting can be caused whenever all features are used in the flatten layer. Therefore a dropout layer can be set in place.\cite{1d_cnn} This layer cancels out neurons during the training process of a NN which reduces the model's size. 
 
 \section{Loss Function}
 \label{sec:loss_func}
-The loss function is one crucial element as it evaluates the accuracy of the produced outputs from a NN. This is achieved by calculating the difference between the predicted value and the actual value provided by the test dataset. Supervised learning deals with two different problems which is either a classification problem e.g. is the animal on the picture a cat or with regression problems like predicting future bookings. Both of those problems use a different loss function.\cite{loss_func} As this section focuses on solving a regression problem a brief overview of available loss functions and their characteristics are given. 
+The loss function is one crucial element as it evaluates the accuracy of the produced outputs from a NN. This is achieved by calculating the divergence between the predicted value and the actual value provided by the test dataset. Supervised learning deals with two different problems which is either a classification problem e.g. is the animal on the picture a cat or with regression problems like predicting future bookings. Both of those problems use a different loss function.\cite{loss_func} As this section focuses on solving a regression problem a brief overview of available loss functions and their characteristics are given. 
 
 \begin{table*}[htbp]
 	\centering
@@ -205,7 +208,7 @@ def get_booking_data():
     return res
 \end{lstlisting}
 
-Once the data is retrieved from the database it is directly converted to a \verb|pandas dataframe|. As mentioned in chapter \ref{sec:data_aug} data augmentation is necessary to compensate the lack of data during Covid19. Corresponding to the workflow described in figure \ref{fig:workflow} the data now needs to be separated into a training and test set. The training set is used to train the model whereas the test set is used to evaluate how the trained model performs. Therefore the trained model is used to predict the values for timestamps used in the test set. By reviewing other scientific works that deal with time series forecasting \cite{1d_cnn}\cite{cnn_vechicle}\cite{cnn_intro}\cite{lstm_overcome_rnn_problem}\cite{lstm_module}\cite{lstm_stock} the most accurate results are achieved by using ranges from 80 \% to 90 \% for training and depending on the range for training data a range of 20 \% to 10 \% for test data are recommended. The initial split used for both models correlates to 90\% training data to 10 \% test data as visualised in figure \ref{fig:training_test}. Therefore the following code is applied to split the data:
+Once the data is retrieved from the database it is directly converted to a \verb|pandas dataframe|. As mentioned in chapter \ref{sec:data_aug} data augmentation is necessary to compensate the lack of data during Covid19. Corresponding to the workflow described in figure \ref{fig:workflow} the data now needs to be separated into a training and test set. The test set is used to assess how well the trained model performs, whereas the training set is used to train the model. The trained model performs predictions for timestamps used in the test set. By reviewing other scientific works that deal with time series forecasting \cite{1d_cnn}\cite{cnn_vechicle}\cite{cnn_intro}\cite{lstm_overcome_rnn_problem}\cite{lstm_module}\cite{lstm_stock} the most accurate results are achieved by using ranges from 80 \% to 90 \% for training and depending on the range for training data a range of 20 \% to 10 \% for test data are recommended. The initial split used for both models correlates to 90\% training data to 10 \% test data as visualised in figure \ref{fig:training_test}. Therefore the following code is applied to split the data:
 \begin{lstlisting}
 training_end = pd.to_datetime('2022-10-31')
 #total range 2017-01-01 - 2023-05-31 = 2342 days
@@ -276,7 +279,7 @@ When training the model using the initial parameters described during this chapt
 	\caption{Decrease of MAE and Trainig loss for 100 epochs - [source:[author]]}
 	\label{fig:training_test}
 \end{figure}
-The training loss in general indicates the performance of the model based on the training set. It is generated through the output of the applied loss function. Low values basically mean that the model is able to catch up patterns within the training set but could also indicate overfitting. This causes the model to just memorize the training set rather than learning actual patterns. Furthermore the loss indicates the amount of required epochs for the model to learn. Whenever the loss stalls or is starting to increase again the training should be stopped. The MAE is another metric to observe the ability of the model to learn. The MAE is obtained by calculating the mean of actual values minus the predicted values. This result is divided by the number of observations.\cite{mae} Similar to the training loss a lower value indicates the performance of the model but the MAE needs to be interpreted in context with the range the predictions are made for. For example a MAE of 1 for predictions made in ranges between 1-2 is interpreted as poor performance, whereas a MAE of 100 for predictions made in a range between 100.000 and 1.000.000 indicates a proper result.
+In general, the training loss represents how well the model performed using the training data. It is generated through the output of the applied loss function. Low values basically mean that the model is able to catch up patterns within the training set but could also indicate overfitting. This causes the model to just memorize the training set rather than learning actual patterns. Furthermore the loss indicates the amount of required epochs for the model to learn. Whenever the loss stalls or is starting to increase again the training should be stopped. The MAE is another metric to observe the ability of the model to learn. The MAE is obtained by calculating the mean of actual values minus the predicted values. This result is divided by the number of observations.\cite{mae} Similar to the training loss a lower value indicates the performance of the model but the MAE needs to be interpreted in context with the range the predictions are made for. For example a MAE of 1 for predictions made in ranges between 1-2 is interpreted as poor performance, whereas a MAE of 100 for predictions made in a range between 100.000 and 1.000.000 indicates a proper result.
 
 \begin{figure}[H]
 	\centering
@@ -284,7 +287,7 @@ The training loss in general indicates the performance of the model based on the
 	\caption{Predictions on test set from 01-01-203 to 01-05-2023 - [source:[author]]}
 	\label{fig:lstm_1_training_test}
 \end{figure}
-By looking at figure \ref{fig:lstm_1_training_test} it is clear to see that the model's performance in terms of accuracy is insufficient. Investigating the training loss and MAE shows that the final MAE of around 0.5 is acceptable in context of the prediction range ranging from 1 to 17. This indicates that the model tends to overfitting as the final training loss is low as well. Section \ref{sec:improving} investigates strategies on how to improve the model's performance.
+By looking at figure \ref{fig:lstm_1_training_test} it is clear to see that the model's performance in terms of accuracy is insufficient. Investigating the training loss and MAE shows that the final MAE of around 0.5 is acceptable in context of the prediction range ranging from 1 to 17. Given that the final training loss is also minimal, this suggests that the model has a tendency to overfit. Section \ref{sec:improving} investigates strategies on how to improve the model's performance.
 
 \subsection{Implementation of CNN}
 Similar to the implementation of LSTM the implementation of a CNN does not require much code. Furthermore some parts of the code use the same parameters. Those parameters are not explained again. To initialise a CNN model the following code is required: 
@@ -312,7 +315,7 @@ The first training results produced by the CNN model look the following:
 	\caption{Decrease of MAE and Trainig Loss for 100 epochs - [source:[author]]}
 	\label{fig:training_test_cnn}
 \end{figure}
-When analysing the metrics highlighted in figure \ref{fig:training_test_cnn} it is clear to see that both the training loss and the MAE are still very high after 100 epochs. This indicates that the model needs to be trained utilising more epochs. The results of the training loss as well as the MAE are reflected also in the actual predictions made on the test set.
+When analysing the metrics highlighted in figure \ref{fig:training_test_cnn} it is clear to see that both the training loss and the MAE are still very high after 100 epochs. This suggests that more epochs should be used to train the model. The results of the training loss as well as the MAE are reflected also in the actual predictions made on the test set.
 
 \begin{figure}[H]
 	\centering
