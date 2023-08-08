@@ -79,18 +79,6 @@ To pre-process the data the following logic is applied once:
 The logic above compares all entries based on the attributes mentioned above and removes equal entries that are within a timespan of 1 hour. The dataset currently hosts around 324.000 entries. By applying this logic the entries are reduced by around 122.000. 
 
 To validate and norm the available data present in both tables no actions are required due to fact that attributes that do not meet their defined data types are not stored in first place. 
-
-\section{Overfitting and Underfitting}
-One problem that can occur when utilising NNs for predictions is overfitting or underfitting of the training data. Both scenarios result in a poor performance of the trained model. \cite{fitting} 
-\subsection{Overfitting}
-
-Overfitting describes the phenomenon that the model is not able to improve its problem solving capabilities after a certain period of training. There are multiple reasons for the occurrence of overfitting. One reason for example is an inaccurate or unbalanced training set. This leads to the fact that the NN produces wrong connections during its training.  Whereas the results for the training set are accurate the problems  occur during the validation phase because the model learned wrong characteristics. \cite{fitting} 
-\subsection{Underfitting} 
-On the other hand, underfitting arises when the model cannot identify the traits of the training set and therefore struggles to achieve matching its target values. This results in high loss values. Reasons for underfitting are caused by a lack of trainable parameters as well as a NN model with a simple architecture in terms of hidden layers. \cite{fitting} 
-\newline
-\newline
-As the data was affected during the Covid19 pandemic data augmentation is necessary in order to avoid both scenarios.
-
 \section{Data Augmentation}
 \label{sec:data_aug}
 Starting from March 2020 countries like Austria, Germany, Switzerland and Liechtenstein had to put travel restrictions into effect due to the ongoing Covid19 pandemic. These travel restrictions impacted the gathered booking data as those restrictions forbid travelling and therefore customers were legally not allowed to book buses at all.
